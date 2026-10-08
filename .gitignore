@@ -16,3 +16,8 @@ local.properties
 
 # Firebase 설정(API 키 포함). 각 개발 환경에 직접 배치한다.
 /app/google-services.json
+
+# Play 업로드 키 서명 정보(비밀번호 포함)
+/keystore.properties
+*.jks
+*.keystore
