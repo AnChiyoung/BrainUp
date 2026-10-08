@@ -1,6 +1,5 @@
 package com.dev.goodluckcy.brainup.feature.pattern
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,30 +11,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,10 +37,30 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcon
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcons
+import com.dev.goodluckcy.brainup.core.designsystem.component.RibbonBanner
+import com.dev.goodluckcy.brainup.core.designsystem.component.chunky
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Danger
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Go
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Mint
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Night
+import com.dev.goodluckcy.brainup.core.designsystem.theme.NightDeep
+import com.dev.goodluckcy.brainup.core.designsystem.theme.NightDeeper
+import com.dev.goodluckcy.brainup.core.designsystem.theme.NightLight
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Sky
+import com.dev.goodluckcy.brainup.core.designsystem.theme.SkyDark
+import com.dev.goodluckcy.brainup.core.designsystem.theme.SkyGlow
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Sun
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.feature.game.ContinueWithAdButton
 import com.dev.goodluckcy.brainup.feature.game.GamePhase
+import com.dev.goodluckcy.brainup.feature.game.GameScaffold
+import com.dev.goodluckcy.brainup.feature.game.HeartChip
+import com.dev.goodluckcy.brainup.feature.game.PrimaryGameButton
+import com.dev.goodluckcy.brainup.feature.game.ProgressDots
+import com.dev.goodluckcy.brainup.feature.game.ScoreChip
 
 @Composable
 fun PatternMemoryScreen(
@@ -70,7 +83,6 @@ fun PatternMemoryScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PatternMemoryContent(
     uiState: PatternMemoryUiState,
@@ -80,60 +92,54 @@ private fun PatternMemoryContent(
     onShowResult: () -> Unit,
     onContinue: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding(),
+    GameScaffold(
+        title = stringResource(R.string.game_pattern),
+        onBack = onBack,
+        skyVariant = 2,
+        trailing = {
+            ScoreChip(uiState.score)
+            HeartChip(if (uiState.continueUsed) 0 else 1)
+        },
     ) {
-        TopAppBar(
-            title = { Text(stringResource(R.string.game_pattern)) },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.action_back),
-                    )
-                }
+        RibbonBanner(
+            text = if (uiState.phase == GamePhase.Ready) {
+                stringResource(R.string.ribbon_ready)
+            } else {
+                stringResource(R.string.ribbon_round_length, uiState.round, uiState.sequence.size)
             },
+            color = Sky,
+            tailColor = SkyDark,
         )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            StatusRow(uiState)
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = instructionText(uiState),
-                style = MaterialTheme.typography.titleMedium,
-                color = if (uiState.phase == GamePhase.Finished) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-                textAlign = TextAlign.Center,
+        Text(
+            text = instructionText(uiState),
+            style = MaterialTheme.typography.titleLarge,
+            color = if (uiState.phase == GamePhase.Finished) Danger else Color.White,
+            textAlign = TextAlign.Center,
+        )
+        if (uiState.sequence.isNotEmpty()) {
+            ProgressDots(
+                done = if (uiState.phase == GamePhase.Memorizing) 0 else uiState.inputCount,
+                total = uiState.sequence.size,
+                color = Sky,
             )
-            BoxWithConstraints(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                // 작은 화면에서도 위아래 요소와 겹치지 않도록 너비·높이 중 작은 쪽에 맞춘다.
-                val side = minOf(maxWidth, maxHeight, MAX_GRID_SIZE)
-                TileGrid(uiState = uiState, onTileTap = onTileTap, modifier = Modifier.size(side))
+        }
+        BoxWithConstraints(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            // 작은 화면에서도 위아래 요소와 겹치지 않도록 너비·높이 중 작은 쪽에 맞춘다.
+            val side = minOf(maxWidth, maxHeight, MAX_BOARD_SIZE)
+            TileBoard(uiState = uiState, onTileTap = onTileTap, modifier = Modifier.size(side))
+        }
+        when (uiState.phase) {
+            GamePhase.Ready -> PrimaryGameButton(stringResource(R.string.action_start), onStart)
+            GamePhase.Finished -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                ContinueWithAdButton(canContinue = uiState.canContinue, onContinue = onContinue)
+                PrimaryGameButton(stringResource(R.string.action_show_result), onShowResult)
             }
-            when (uiState.phase) {
-                GamePhase.Ready -> PrimaryButton(stringResource(R.string.action_start), onStart)
-                GamePhase.Finished -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ContinueWithAdButton(canContinue = uiState.canContinue, onContinue = onContinue)
-                    PrimaryButton(stringResource(R.string.action_show_result), onShowResult)
-                }
-                else -> Spacer(Modifier.height(BUTTON_HEIGHT))
-            }
-            Spacer(Modifier.height(8.dp))
+            else -> Spacer(Modifier.height(BUTTON_SPACE))
         }
     }
 }
@@ -142,55 +148,29 @@ private fun PatternMemoryContent(
 private fun instructionText(uiState: PatternMemoryUiState): String = when (uiState.phase) {
     GamePhase.Ready -> stringResource(R.string.pattern_rules)
     GamePhase.Memorizing -> stringResource(R.string.pattern_memorizing)
-    GamePhase.Answering -> stringResource(
-        R.string.pattern_answering,
-        uiState.inputCount,
-        uiState.sequence.size,
-    )
+    GamePhase.Answering -> stringResource(R.string.pattern_answering, uiState.inputCount, uiState.sequence.size)
     GamePhase.Success -> stringResource(R.string.pattern_success)
     GamePhase.Finished -> stringResource(R.string.pattern_finished)
 }
 
 @Composable
-private fun StatusRow(uiState: PatternMemoryUiState) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-    ) {
-        StatusItem(stringResource(R.string.label_round), uiState.round.toString())
-        StatusItem(
-            stringResource(R.string.pattern_length),
-            if (uiState.sequence.isEmpty()) "-" else uiState.sequence.size.toString(),
-        )
-        StatusItem(stringResource(R.string.label_score), uiState.score.toString())
-    }
-}
-
-@Composable
-private fun StatusItem(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-        )
-    }
-}
-
-@Composable
-private fun TileGrid(
+private fun TileBoard(
     uiState: PatternMemoryUiState,
     onTileTap: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val size = PatternMemoryEngine.GRID_SIZE
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .padding(bottom = 8.dp)
+            .chunky(
+                color = NightDeep,
+                shape = RoundedCornerShape(34.dp),
+                shadowColor = NightDeeper,
+                depth = 8.dp,
+                borderWidth = 4.dp,
+            )
+            .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         for (row in 0 until size) {
@@ -200,7 +180,7 @@ private fun TileGrid(
             ) {
                 for (col in 0 until size) {
                     val tile = row * size + col
-                    Tile(
+                    GemTile(
                         tile = tile,
                         uiState = uiState,
                         onClick = { onTileTap(tile) },
@@ -214,55 +194,68 @@ private fun TileGrid(
     }
 }
 
+/** 보석처럼 아래쪽이 진한 타일. 점등되면 하늘색으로 빛난다. */
 @Composable
-private fun Tile(
+private fun GemTile(
     tile: Int,
     uiState: PatternMemoryUiState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = MaterialTheme.colorScheme
-    val background: Color = when (tile) {
-        uiState.wrongTile -> colors.error
-        uiState.expectedTile -> colors.primary
-        uiState.litTile -> colors.primary
-        uiState.flashedTile -> colors.secondary
-        else -> colors.surfaceVariant
+    val (face, bottom) = when (tile) {
+        uiState.wrongTile -> Danger to Color(0xFFB8262D)
+        uiState.expectedTile -> SkyGlow to Sky
+        uiState.litTile -> SkyGlow to Sky
+        uiState.flashedTile -> Go to Mint
+        else -> NightLight to Night
     }
-    val shape = RoundedCornerShape(16.dp)
+    val glowing = tile == uiState.litTile || tile == uiState.expectedTile
+    val shape = RoundedCornerShape(22.dp)
     val description = stringResource(R.string.pattern_tile, tile + 1)
     Box(
         modifier = modifier
-            .clip(shape)
-            .background(background)
-            .then(
-                if (tile == uiState.expectedTile) {
-                    Modifier.border(4.dp, colors.onPrimaryContainer, shape)
-                } else {
-                    Modifier
-                },
-            )
+            .drawBehind {
+                if (glowing) {
+                    drawRoundRect(
+                        color = SkyGlow.copy(alpha = 0.45f),
+                        topLeft = Offset(-7.dp.toPx(), -7.dp.toPx()),
+                        size = Size(size.width + 14.dp.toPx(), size.height + 14.dp.toPx()),
+                        cornerRadius = CornerRadius(28.dp.toPx()),
+                    )
+                }
+            }
+            .chunky(color = face, shape = shape, depth = 0.dp)
+            .drawBehind {
+                // 아래쪽 진한 띠로 보석 같은 입체감
+                drawRoundRect(
+                    color = bottom,
+                    topLeft = Offset(3.dp.toPx(), size.height - 11.dp.toPx()),
+                    size = Size(size.width - 6.dp.toPx(), 8.dp.toPx()),
+                    cornerRadius = CornerRadius(8.dp.toPx()),
+                )
+            }
+            .then(if (tile == uiState.expectedTile) Modifier.border(4.dp, Sun, shape) else Modifier)
             .clickable(enabled = uiState.isInputEnabled, role = Role.Button, onClick = onClick)
             .semantics { contentDescription = description },
-    )
-}
-
-@Composable
-private fun PrimaryButton(text: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(BUTTON_HEIGHT),
+        contentAlignment = Alignment.TopStart,
     ) {
-        Text(text = text, style = MaterialTheme.typography.titleMedium)
+        if (glowing) {
+            GameIcon(
+                icon = GameIcons.Sparkle,
+                size = 22.dp,
+                tint = Color.White,
+                fill = Color.White,
+                strokeWidth = 1f,
+                modifier = Modifier.padding(10.dp),
+            )
+        }
     }
 }
 
-private val BUTTON_HEIGHT = 56.dp
-private val MAX_GRID_SIZE = 420.dp
+private val MAX_BOARD_SIZE = 420.dp
+private val BUTTON_SPACE = 66.dp
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun PatternMemoryPlaybackPreview() {
     BrainUpTheme {
@@ -283,7 +276,7 @@ private fun PatternMemoryPlaybackPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun PatternMemoryFinishedPreview() {
     BrainUpTheme {

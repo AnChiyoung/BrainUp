@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- core/designsystem/theme/Color.kt의 Indigo40, Amber80과 같은 값 -->
+    <!-- core/designsystem/theme/Color.kt와 같은 값 -->
     <color name="brand_indigo">#FF4A55C9</color>
     <color name="brand_amber">#FFFFC870</color>
+    <color name="night">#FF3B2A9E</color>
 </resources>

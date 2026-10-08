@@ -1,216 +1,344 @@
 package com.dev.goodluckcy.brainup.feature.home
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.ads.BannerAd
-import com.dev.goodluckcy.brainup.core.designsystem.descriptionRes
+import com.dev.goodluckcy.brainup.core.designsystem.color
+import com.dev.goodluckcy.brainup.core.designsystem.component.BrainyFace
+import com.dev.goodluckcy.brainup.core.designsystem.component.CoinDot
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameButton
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcon
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcons
+import com.dev.goodluckcy.brainup.core.designsystem.component.HudChip
+import com.dev.goodluckcy.brainup.core.designsystem.component.OutlineWidth
+import com.dev.goodluckcy.brainup.core.designsystem.component.TreasureChest
+import com.dev.goodluckcy.brainup.core.designsystem.component.chunky
+import com.dev.goodluckcy.brainup.core.designsystem.component.nightSky
+import com.dev.goodluckcy.brainup.core.designsystem.icon
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Brainy
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Ink
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Lavender
+import com.dev.goodluckcy.brainup.core.designsystem.theme.NightPath
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Orange
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Sun
 import com.dev.goodluckcy.brainup.core.designsystem.titleRes
 import com.dev.goodluckcy.brainup.domain.model.GameType
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
     onGameClick: (GameType) -> Unit,
-    onSettingsClick: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeContent(
-        uiState = uiState,
-        onGameClick = onGameClick,
-        onSettingsClick = onSettingsClick,
-    )
+    HomeContent(uiState = uiState, onGameClick = onGameClick)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeContent(
     uiState: HomeUiState,
     onGameClick: (GameType) -> Unit,
-    onSettingsClick: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    fontWeight = FontWeight.Bold,
-                )
-            },
-            actions = {
-                IconButton(onClick = onSettingsClick) {
-                    Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
-                }
-            },
-        )
-        Column(
+    // 아직 오늘 안 한 첫 게임이 '다음 스테이지'. 모두 끝냈으면 처음 게임을 한 판 더.
+    val nextGame = GameType.entries.firstOrNull { it !in uiState.completedGames }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .nightSky(variant = 0)
+            .statusBarsPadding(),
+    ) {
+        HomeHud(uiState)
+        AdventureMap(
+            uiState = uiState,
+            nextGame = nextGame,
+            onGameClick = onGameClick,
             modifier = Modifier
                 .weight(1f)
+                .fillMaxWidth(),
+        )
+        GameButton(
+            onClick = { onGameClick(nextGame ?: GameType.entries.first()) },
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .height(70.dp),
+            depth = 7.dp,
+            shape = RoundedCornerShape(22.dp),
         ) {
-            Text(
-                text = stringResource(R.string.home_tagline),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            DailyChallengeCard(uiState)
-            Spacer(Modifier.size(4.dp))
-            Text(
-                text = stringResource(R.string.home_games_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            GameType.entries.forEach { gameType ->
-                GameCard(
-                    gameType = gameType,
-                    completed = gameType in uiState.completedGames,
-                    onClick = { onGameClick(gameType) },
+            GameIcon(icon = GameIcons.Play, size = 26.dp, tint = Ink, fill = Ink, strokeWidth = 1f)
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text(
+                    text = stringResource(if (nextGame != null) R.string.home_play else R.string.home_play_again),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Ink,
+                )
+                Text(
+                    text = if (nextGame != null) {
+                        stringResource(R.string.home_play_next, stringResource(nextGame.titleRes))
+                    } else {
+                        stringResource(R.string.home_all_clear)
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Ink,
                 )
             }
         }
-        BannerAd()
+        BannerAd(modifier = Modifier.padding(top = 8.dp))
     }
 }
 
 @Composable
-private fun DailyChallengeCard(uiState: HomeUiState) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
+private fun HomeHud(uiState: HomeUiState) {
+    val dateText = remember {
+        LocalDate.now().format(DateTimeFormatter.ofPattern("M월 d일 EEEE", Locale.KOREAN))
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(Brainy, RoundedCornerShape(16.dp))
+                .border(OutlineWidth, Color.White, RoundedCornerShape(16.dp)),
+            contentAlignment = Alignment.Center,
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.home_daily_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                )
-                if (uiState.streakDays > 0) {
-                    Text(
-                        text = stringResource(R.string.streak_days, uiState.streakDays),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                    )
+            BrainyFace(Modifier.size(34.dp))
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = dateText, style = MaterialTheme.typography.labelMedium, color = Lavender)
+            Text(
+                text = stringResource(R.string.home_adventure_title),
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White,
+            )
+        }
+        if (uiState.todayScore > 0) {
+            HudChip(text = uiState.todayScore.toString()) { CoinDot() }
+        }
+        HudChip(text = uiState.streakDays.toString()) {
+            GameIcon(icon = GameIcons.Flame, size = 18.dp, tint = Orange, fill = Orange, strokeWidth = 1.5f)
+        }
+    }
+}
+
+/** 지도 위 노드 위치(지도 영역 대비 비율). 아래에서 위로 숫자 → 반응 → 패턴 → 보물상자 */
+private val NodePositions = mapOf(
+    GameType.NUMBER_MEMORY to Offset(0.28f, 0.83f),
+    GameType.REACTION to Offset(0.70f, 0.58f),
+    GameType.PATTERN to Offset(0.30f, 0.33f),
+)
+private val ChestPosition = Offset(0.70f, 0.10f)
+
+@Composable
+private fun AdventureMap(
+    uiState: HomeUiState,
+    nextGame: GameType?,
+    onGameClick: (GameType) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(modifier = modifier) {
+        val mapWidth = maxWidth
+        val mapHeight = maxHeight
+        // 작은 화면에서도 노드가 겹치지 않도록 지도 높이에 맞춰 크기를 줄인다.
+        val nodeSize = minOf(92.dp, mapHeight * 0.22f)
+
+        MapPath(Modifier.fillMaxSize())
+
+        val chestCompleted = uiState.isDailyCompleted
+        Column(
+            modifier = Modifier.offset(
+                x = mapWidth * ChestPosition.x - 70.dp,
+                y = mapHeight * ChestPosition.y - nodeSize * 0.35f,
+            ).width(140.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            TreasureChest(
+                modifier = Modifier.size(width = nodeSize, height = nodeSize * 0.75f),
+                open = chestCompleted,
+            )
+            Text(
+                text = stringResource(R.string.home_chest, uiState.completedCount, uiState.totalCount),
+                modifier = Modifier
+                    .background(Sun, RoundedCornerShape(999.dp))
+                    .border(2.dp, Ink, RoundedCornerShape(999.dp))
+                    .padding(horizontal = 10.dp, vertical = 2.dp),
+                style = MaterialTheme.typography.titleSmall,
+                color = Ink,
+            )
+        }
+
+        GameType.entries.forEach { gameType ->
+            val position = NodePositions.getValue(gameType)
+            MapNode(
+                gameType = gameType,
+                done = gameType in uiState.completedGames,
+                isNext = gameType == nextGame,
+                nodeSize = nodeSize,
+                onClick = { onGameClick(gameType) },
+                modifier = Modifier.offset(
+                    x = mapWidth * position.x - NodeColumnWidth / 2,
+                    y = mapHeight * position.y - nodeSize / 2 - BubbleSpace,
+                ),
+            )
+        }
+    }
+}
+
+private val NodeColumnWidth = 150.dp
+private val BubbleSpace = 36.dp
+
+@Composable
+private fun MapPath(modifier: Modifier) {
+    Canvas(modifier = modifier) {
+        fun at(p: Offset) = Offset(size.width * p.x, size.height * p.y)
+        val number = at(NodePositions.getValue(GameType.NUMBER_MEMORY))
+        val reaction = at(NodePositions.getValue(GameType.REACTION))
+        val pattern = at(NodePositions.getValue(GameType.PATTERN))
+        val chest = at(ChestPosition)
+        val path = Path().apply {
+            moveTo(number.x, number.y)
+            cubicTo(number.x, number.y - 90f, reaction.x, reaction.y + 120f, reaction.x, reaction.y)
+            cubicTo(reaction.x, reaction.y - 120f, pattern.x, pattern.y + 120f, pattern.x, pattern.y)
+            cubicTo(pattern.x, pattern.y - 120f, chest.x, chest.y + 120f, chest.x, chest.y)
+        }
+        drawPath(path, NightPath, style = Stroke(width = 18.dp.toPx(), cap = StrokeCap.Round))
+        drawPath(
+            path = path,
+            color = Color.White.copy(alpha = 0.55f),
+            style = Stroke(
+                width = 4.dp.toPx(),
+                cap = StrokeCap.Round,
+                pathEffect = PathEffect.dashPathEffect(floatArrayOf(2f, 14.dp.toPx())),
+            ),
+        )
+    }
+}
+
+@Composable
+private fun MapNode(
+    gameType: GameType,
+    done: Boolean,
+    isNext: Boolean,
+    nodeSize: Dp,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val title = stringResource(gameType.titleRes)
+    Column(
+        modifier = modifier
+            .width(NodeColumnWidth)
+            .clickable(onClickLabel = title, role = Role.Button, onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.home_next_stage),
+            modifier = Modifier
+                .alpha(if (isNext) 1f else 0f)
+                .padding(bottom = 6.dp)
+                .chunky(color = Color.White, shape = RoundedCornerShape(10.dp), depth = 3.dp, borderWidth = 2.dp)
+                .padding(horizontal = 10.dp, vertical = 3.dp),
+            style = MaterialTheme.typography.titleSmall,
+            color = Ink,
+        )
+        Box(contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .size(nodeSize)
+                    .drawBehind {
+                        if (isNext) drawCircle(gameType.color.copy(alpha = 0.3f), radius = size.minDimension / 2 + 10.dp.toPx())
+                    }
+                    .chunky(color = if (done) Sun else Color.White, shape = CircleShape, depth = 7.dp)
+                    .padding(5.dp)
+                    .background(gameType.color, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                GameIcon(icon = gameType.icon, size = nodeSize * 0.44f, tint = Ink, contentDescription = title)
+            }
+            if (done) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(28.dp)
+                        .background(Sun, CircleShape)
+                        .border(OutlineWidth, Ink, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    GameIcon(icon = GameIcons.Check, size = 16.dp, tint = Ink, strokeWidth = 3.4f)
                 }
             }
-            Text(
-                text = if (uiState.isDailyCompleted) {
-                    stringResource(R.string.home_daily_done)
-                } else {
-                    stringResource(R.string.home_daily_progress, uiState.completedCount, uiState.totalCount)
-                },
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            LinearProgressIndicator(
-                progress = { uiState.completedCount.toFloat() / uiState.totalCount },
-                modifier = Modifier.fillMaxWidth(),
-            )
-            if (uiState.todayScore > 0) {
-                Text(
-                    text = stringResource(R.string.home_today_score, uiState.todayScore),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
         }
+        Text(
+            text = title,
+            modifier = Modifier.padding(top = 10.dp),
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
-@Composable
-private fun GameCard(
-    gameType: GameType,
-    completed: Boolean,
-    onClick: () -> Unit,
-) {
-    ElevatedCard(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(gameType.titleRes),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = stringResource(gameType.descriptionRes),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Spacer(Modifier.width(8.dp))
-            if (completed) {
-                Icon(
-                    Icons.Filled.CheckCircle,
-                    contentDescription = stringResource(R.string.home_game_completed),
-                    tint = MaterialTheme.colorScheme.secondary,
-                )
-            } else {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 390, heightDp = 760)
 @Composable
 private fun HomeContentPreview() {
     BrainUpTheme {
         HomeContent(
             uiState = HomeUiState(
-                completedGames = setOf(GameType.REACTION),
+                completedGames = setOf(GameType.NUMBER_MEMORY, GameType.REACTION),
                 todayScore = 712,
                 streakDays = 4,
             ),
             onGameClick = {},
-            onSettingsClick = {},
         )
     }
 }

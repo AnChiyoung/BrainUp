@@ -1,20 +1,27 @@
 package com.dev.goodluckcy.brainup.feature.game
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.ads.LocalAdServices
 import com.dev.goodluckcy.brainup.core.analytics.RewardType
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameButton
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcon
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcons
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Ink
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Pink
 
 /**
  * 오답 후 '광고 보고 이어하기' 버튼. 보상형 광고가 준비된 경우에만 보인다.
@@ -31,15 +38,19 @@ fun ContinueWithAdButton(
     val isLoaded by adServices.rewarded.isLoaded.collectAsStateWithLifecycle()
     if (!canContinue || !isLoaded) return
 
-    OutlinedButton(
+    GameButton(
         onClick = { adServices.rewarded.show(activity, RewardType.CONTINUE, onContinue) },
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .height(62.dp),
+        color = Color.White,
     ) {
+        GameIcon(icon = GameIcons.Heart, size = 22.dp, tint = Ink, fill = Pink, strokeWidth = 1.6f)
+        Spacer(Modifier.width(8.dp))
         Text(
             text = stringResource(R.string.action_continue_with_ad),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
+            color = Ink,
         )
     }
 }

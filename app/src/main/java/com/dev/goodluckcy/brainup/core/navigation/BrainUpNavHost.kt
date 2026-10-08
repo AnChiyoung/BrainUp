@@ -27,10 +27,7 @@ fun BrainUpNavHost(
         modifier = modifier,
     ) {
         composable<HomeRoute> {
-            HomeScreen(
-                onGameClick = { gameType -> navController.navigate(GameRoute(gameType)) },
-                onSettingsClick = { navController.navigateToTopLevel(TopLevelDestination.SETTINGS) },
-            )
+            HomeScreen(onGameClick = { gameType -> navController.navigate(GameRoute(gameType)) })
         }
         composable<StatsRoute> { StatsScreen() }
         composable<SettingsRoute> { SettingsScreen() }

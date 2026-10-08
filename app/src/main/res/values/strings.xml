@@ -1,17 +1,18 @@
 <resources>
     <string name="app_name">BrainUp</string>
 
-    <string name="nav_home">홈</string>
-    <string name="nav_stats">기록</string>
+    <string name="nav_home">지도</string>
+    <string name="nav_stats">트로피</string>
     <string name="nav_settings">설정</string>
     <string name="action_back">뒤로가기</string>
 
-    <string name="home_tagline">매일 3분 두뇌 훈련</string>
-    <string name="home_daily_title">오늘의 도전</string>
-    <string name="home_daily_progress">%1$d/%2$d 게임 완료</string>
-    <string name="home_daily_done">오늘의 도전 완료! 내일 또 만나요</string>
-    <string name="home_games_title">게임</string>
-    <string name="home_game_completed">오늘 완료</string>
+    <string name="home_adventure_title">오늘의 모험</string>
+    <string name="home_next_stage">다음 스테이지!</string>
+    <string name="home_chest">보물상자 %1$d/%2$d</string>
+    <string name="home_play">플레이</string>
+    <string name="home_play_again">한 판 더!</string>
+    <string name="home_play_next">다음: %1$s</string>
+    <string name="home_all_clear">오늘의 모험 완료!</string>
 
     <string name="game_number_memory">숫자 기억력</string>
     <string name="game_number_memory_desc">잠깐 보인 숫자를 순서대로 입력하세요</string>
@@ -22,30 +23,27 @@
 
 
     <string name="action_start">시작</string>
+    <string name="ribbon_ready">준비!</string>
+    <string name="ribbon_round_level">ROUND %1$d · Lv.%2$d</string>
+    <string name="ribbon_round_length">ROUND %1$d · %2$d칸</string>
     <string name="action_delete">지우기</string>
     <string name="action_show_result">결과 보기</string>
     <string name="action_retry">다시 도전</string>
-    <string name="action_next_game">다음 게임: %1$s</string>
-    <string name="action_home">홈으로</string>
-    <string name="action_continue_with_ad">▶ 광고 보고 한 번 더 도전</string>
+    <string name="action_continue_with_ad">광고 보고 한 번 더 도전</string>
 
-    <string name="label_round">라운드</string>
-    <string name="label_level">레벨</string>
-    <string name="label_score">점수</string>
 
     <string name="number_memory_ready">준비되면 시작을 누르세요</string>
     <string name="number_memory_rules">화면에 잠깐 나타나는 숫자를 기억한 뒤\n같은 순서대로 입력하세요.\n\n라운드를 통과할수록 숫자가 늘어납니다.</string>
-    <string name="number_memory_memorizing">숫자를 기억하세요</string>
-    <string name="number_memory_answering">본 순서대로 입력하세요</string>
+    <string name="number_memory_memorizing">숫자를 기억해!</string>
+    <string name="number_memory_answering">본 순서대로 입력!</string>
     <string name="number_memory_success">다음 라운드로!</string>
-    <string name="number_memory_finished">아쉬워요, 게임이 끝났습니다</string>
+    <string name="number_memory_finished">아쉬워요!</string>
     <string name="number_memory_correct">정답!</string>
-    <string name="number_memory_wrong">틀렸어요</string>
     <string name="number_memory_answer">정답</string>
     <string name="number_memory_your_input">내 입력</string>
 
     <string name="unit_ms">%1$d ms</string>
-    <string name="reaction_attempt">시도</string>
+    <string name="reaction_attempt_n">%1$d회</string>
     <string name="reaction_best">최고 기록</string>
     <string name="reaction_median">중앙값</string>
     <string name="reaction_tap_to_start">탭하여 시작</string>
@@ -61,34 +59,31 @@
     <string name="reaction_disclaimer">기기의 화면·터치 지연이 포함된 참고용 기록입니다.</string>
 
     <string name="pattern_rules">타일이 빛나는 순서를 기억한 뒤\n같은 순서로 터치하세요.\n라운드마다 하나씩 길어집니다.</string>
-    <string name="pattern_memorizing">빛나는 순서를 기억하세요</string>
-    <string name="pattern_answering">같은 순서로 터치하세요 (%1$d/%2$d)</string>
-    <string name="pattern_success">정답! 하나 더 늘어납니다</string>
-    <string name="pattern_finished">틀렸어요 — 테두리 타일이 정답입니다</string>
-    <string name="pattern_length">길이</string>
+    <string name="pattern_memorizing">빛나는 순서를 기억해!</string>
+    <string name="pattern_answering">같은 순서로 터치! (%1$d/%2$d)</string>
+    <string name="pattern_success">정답! 하나 더 늘어나요</string>
+    <string name="pattern_finished">아쉬워요! 노란 테두리가 정답</string>
     <string name="pattern_tile">타일 %1$d</string>
 
-    <string name="result_first_record">첫 기록이에요!</string>
-    <string name="result_new_best">🏆 개인 최고 기록 갱신! (이전 %1$d점)</string>
+    <string name="result_stage_clear">스테이지 클리어!</string>
+    <string name="result_first_sticker">첫 기록!</string>
+    <string name="result_new_best_sticker">최고 기록 갱신!</string>
+    <string name="result_chest_remaining">보물상자까지 %1$d스테이지!</string>
+    <string name="result_chest_opened">보물상자 오픈! 오늘의 모험 완료</string>
+    <string name="action_next_stage">다음 스테이지: %1$s</string>
+    <string name="action_to_map">지도로</string>
     <string name="result_best_score">내 최고 기록: %1$d점</string>
-    <string name="result_daily_completed_now">🎉 오늘의 도전 완료!</string>
-    <string name="result_daily_progress">오늘의 도전 %1$d/%2$d</string>
 
-    <string name="streak_days">🔥 %1$d일 연속</string>
-    <string name="home_today_score">오늘 점수 %1$d점</string>
 
-    <string name="stats_streak_title">연속 완료</string>
-    <string name="stats_streak_value">%1$d일</string>
-    <string name="stats_streak_today_done">오늘의 도전 완료! 내일도 이어가세요</string>
-    <string name="stats_streak_keep">오늘의 도전을 완료하면 %1$d일이 돼요</string>
-    <string name="stats_streak_start">오늘의 도전을 완료해 연속 기록을 시작하세요</string>
-    <string name="stats_best_records">게임별 최고 기록</string>
-    <string name="stats_no_record">아직 기록이 없어요</string>
-    <string name="stats_best_number_memory">%1$d점 · 레벨 %2$d</string>
-    <string name="stats_best_reaction">%1$d점 · %2$d ms</string>
-    <string name="stats_best_pattern">%1$d점 · 길이 %2$d</string>
-    <string name="stats_recent_days">최근 7일 점수</string>
-    <string name="stats_legend_completed">오늘의 도전 완료한 날</string>
+    <string name="trophy_room_title">트로피 방</string>
+    <string name="trophy_streak">%1$d일 연속!</string>
+    <string name="trophy_week_title">최근 7일 도장</string>
+    <string name="trophy_chests">보물상자 %1$d개 획득</string>
+    <string name="trophy_shelf_title">게임 트로피</string>
+    <string name="trophy_points">%1$d점</string>
+    <string name="stats_streak_today_done">오늘도 클리어! 내일 또 만나요</string>
+    <string name="stats_streak_keep">오늘 클리어하면 %1$d일째!</string>
+    <string name="stats_streak_start">오늘의 모험을 끝내고 불꽃을 켜세요</string>
     <string name="stats_today">오늘</string>
     <!-- DayOfWeek 순서(월요일부터) -->
     <string-array name="day_of_week_short">
@@ -109,7 +104,6 @@
     <string name="settings_version">버전</string>
 
     <string name="result_max_pattern_length">최대 기억 길이</string>
-    <string name="result_score">최종 점수</string>
     <string name="result_rounds_cleared">성공 라운드</string>
     <string name="result_level">최고 레벨</string>
     <string name="result_duration">플레이 시간</string>

@@ -1,47 +1,35 @@
 package com.dev.goodluckcy.brainup.core.designsystem.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Indigo80,
-    secondary = Teal80,
-    tertiary = Amber80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Indigo40,
-    secondary = Teal40,
-    tertiary = Amber40
+/** "모험 지도" 디자인은 밤하늘 배경 하나로 통일하므로 시스템 다크 모드와 관계없이 같은 색을 쓴다. */
+private val AdventureColorScheme = darkColorScheme(
+    primary = Sun,
+    onPrimary = Ink,
+    secondary = Mint,
+    onSecondary = Ink,
+    tertiary = Sky,
+    onTertiary = Ink,
+    background = Night,
+    onBackground = Color.White,
+    surface = NightDeep,
+    onSurface = Color.White,
+    surfaceVariant = NightDeep,
+    onSurfaceVariant = Lavender,
+    outline = Ink,
+    outlineVariant = NightPath,
+    error = Danger,
+    onError = Color.White,
 )
 
 @Composable
-fun BrainUpTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // 브랜드 색상을 유지하기 위해 기본값은 false
-    dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
+fun BrainUpTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = AdventureColorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

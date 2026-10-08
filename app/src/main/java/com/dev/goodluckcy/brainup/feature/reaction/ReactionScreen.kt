@@ -1,37 +1,32 @@
 package com.dev.goodluckcy.brainup.feature.reaction
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,11 +35,27 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcon
+import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcons
+import com.dev.goodluckcy.brainup.core.designsystem.component.GamePanel
+import com.dev.goodluckcy.brainup.core.designsystem.component.HudChip
+import com.dev.goodluckcy.brainup.core.designsystem.component.chunky
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Danger
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Go
+import com.dev.goodluckcy.brainup.core.designsystem.theme.GoDark
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Ink
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Lavender
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Mint
+import com.dev.goodluckcy.brainup.core.designsystem.theme.NightDeep
+import com.dev.goodluckcy.brainup.core.designsystem.theme.NightDeeper
+import com.dev.goodluckcy.brainup.core.designsystem.theme.NightLight
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Pink
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Sky
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Sun
 import com.dev.goodluckcy.brainup.domain.model.GameResult
-
-private val WaitingColor = Color(0xFFC62828)
-private val GoColor = Color(0xFF2E7D32)
+import com.dev.goodluckcy.brainup.feature.game.GameScaffold
+import com.dev.goodluckcy.brainup.feature.game.PrimaryGameButton
 
 @Composable
 fun ReactionScreen(
@@ -64,7 +75,6 @@ fun ReactionScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReactionContent(
     uiState: ReactionUiState,
@@ -72,109 +82,105 @@ private fun ReactionContent(
     onTap: () -> Unit,
     onShowResult: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding(),
-    ) {
-        TopAppBar(
-            title = { Text(stringResource(R.string.game_reaction)) },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.action_back),
-                    )
+    GameScaffold(
+        title = stringResource(R.string.game_reaction),
+        onBack = onBack,
+        skyVariant = 0,
+        trailing = {
+            uiState.reactionsMs.minOrNull()?.let { best ->
+                HudChip(text = stringResource(R.string.unit_ms, best)) {
+                    GameIcon(icon = GameIcons.Bolt, size = 18.dp, tint = Ink, fill = Sun, strokeWidth = 1.6f)
                 }
-            },
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            StatusRow(uiState)
-            Spacer(Modifier.height(16.dp))
-            if (uiState.phase == ReactionPhase.Finished) {
-                FinishedContent(
-                    uiState = uiState,
-                    modifier = Modifier.weight(1f),
-                )
-                Button(
-                    onClick = onShowResult,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                ) {
-                    Text(stringResource(R.string.action_show_result), style = MaterialTheme.typography.titleMedium)
-                }
-            } else {
-                TapArea(
-                    uiState = uiState,
-                    onTap = onTap,
-                    modifier = Modifier.weight(1f),
-                )
             }
-            Spacer(Modifier.height(8.dp))
+        },
+    ) {
+        AttemptLamps(completed = uiState.completedAttempts, total = uiState.totalAttempts)
+        if (uiState.phase == ReactionPhase.Finished) {
+            FinishedContent(uiState, Modifier.weight(1f))
+            PrimaryGameButton(stringResource(R.string.action_show_result), onShowResult)
+        } else {
+            ArcadeTapButton(
+                uiState = uiState,
+                onTap = onTap,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+            )
+            AttemptChips(uiState.reactionsMs)
         }
     }
 }
 
+/** 시도 5회를 신호등처럼 보여준다. 지금 시도는 크게 빛난다. */
 @Composable
-private fun StatusRow(uiState: ReactionUiState) {
+private fun AttemptLamps(completed: Int, total: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier
+            .background(NightDeep, RoundedCornerShape(999.dp))
+            .border(3.dp, Ink, RoundedCornerShape(999.dp))
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        StatusItem(
-            label = stringResource(R.string.reaction_attempt),
-            value = "${uiState.completedAttempts}/${uiState.totalAttempts}",
-        )
-        StatusItem(
-            label = stringResource(R.string.reaction_best),
-            value = uiState.reactionsMs.minOrNull()?.let { stringResource(R.string.unit_ms, it) } ?: "-",
-        )
+        repeat(total) { i ->
+            val isCurrent = i == completed
+            Box(
+                modifier = Modifier
+                    .size(if (isCurrent) 28.dp else 22.dp)
+                    .drawBehind {
+                        if (isCurrent) drawCircle(Sun.copy(alpha = 0.35f), size.minDimension / 2 + 5.dp.toPx())
+                    }
+                    .background(
+                        when {
+                            i < completed -> Mint
+                            isCurrent -> Sun
+                            else -> NightDeeper
+                        },
+                        CircleShape,
+                    )
+                    .border(3.dp, Ink, CircleShape),
+            )
+        }
     }
 }
 
+/** 화면 대부분을 차지하는 커다란 아케이드 버튼. 손가락이 닿는 순간(down)에 측정한다. */
 @Composable
-private fun StatusItem(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-        )
-    }
-}
-
-@Composable
-private fun TapArea(
+private fun ArcadeTapButton(
     uiState: ReactionUiState,
     onTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = MaterialTheme.colorScheme
-    val (background, content) = when (uiState.phase) {
-        ReactionPhase.Waiting -> WaitingColor to Color.White
-        ReactionPhase.Go -> GoColor to Color.White
-        ReactionPhase.TooEarly -> colors.tertiaryContainer to colors.onTertiaryContainer
-        else -> colors.primaryContainer to colors.onPrimaryContainer
+    val (face, rim) = when (uiState.phase) {
+        ReactionPhase.Waiting -> Danger to Color(0xFFB8262D)
+        ReactionPhase.Go -> Go to GoDark
+        ReactionPhase.TooEarly -> Pink to Color(0xFFD63A68)
+        ReactionPhase.AttemptResult -> Sky to Color(0xFF339AF0)
+        else -> Sun to Color(0xFFE0A800)
     }
+    val textColor = if (uiState.phase == ReactionPhase.Waiting) Color.White else Ink
     val currentOnTap by rememberUpdatedState(onTap)
-
+    val shape = RoundedCornerShape(40.dp)
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(background)
-            // 손가락이 닿는 순간(down)에 측정한다.
+            .padding(bottom = 12.dp)
+            .chunky(color = face, shape = shape, depth = 12.dp, borderWidth = 4.dp)
+            .drawBehind {
+                // 아래쪽 테두리 음영 + 왼쪽 위 하이라이트로 입체감
+                val inset = 4.dp.toPx()
+                drawRoundRect(
+                    color = rim,
+                    topLeft = Offset(inset, size.height - 18.dp.toPx()),
+                    size = Size(size.width - inset * 2, 14.dp.toPx()),
+                    cornerRadius = CornerRadius(36.dp.toPx()),
+                )
+                drawRoundRect(
+                    color = Color.White.copy(alpha = 0.45f),
+                    topLeft = Offset(26.dp.toPx(), 22.dp.toPx()),
+                    size = Size(70.dp.toPx(), 18.dp.toPx()),
+                    cornerRadius = CornerRadius(9.dp.toPx()),
+                )
+            }
             .pointerInput(Unit) { detectTapGestures(onPress = { currentOnTap() }) },
         contentAlignment = Alignment.Center,
     ) {
@@ -182,20 +188,26 @@ private fun TapArea(
         Column(
             modifier = Modifier.padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            if (uiState.phase == ReactionPhase.Go || uiState.phase == ReactionPhase.Ready) {
+                GameIcon(icon = GameIcons.Touch, size = 80.dp, tint = textColor, strokeWidth = 2f)
+            }
             Text(
                 text = title,
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = content,
+                style = if (uiState.phase == ReactionPhase.Go) {
+                    MaterialTheme.typography.displayLarge
+                } else {
+                    MaterialTheme.typography.displaySmall
+                },
+                color = textColor,
                 textAlign = TextAlign.Center,
             )
             if (subtitle != null) {
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = content,
+                    color = textColor,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -218,53 +230,74 @@ private fun tapAreaText(uiState: ReactionUiState): Pair<String, String?> = when 
     ReactionPhase.Finished -> "" to null
 }
 
+/** 이번 판 기록 칩. 가장 빠른 기록은 금테. */
 @Composable
-private fun FinishedContent(
-    uiState: ReactionUiState,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+private fun AttemptChips(reactionsMs: List<Long>) {
+    val best = reactionsMs.minOrNull()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
     ) {
-        Text(
-            text = stringResource(R.string.reaction_median),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Text(
-            text = stringResource(R.string.unit_ms, uiState.medianMs ?: 0L),
-            style = MaterialTheme.typography.displayMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Text(
-            text = uiState.reactionsMs.joinToString("  ·  ") { "$it" },
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        if (uiState.falseStarts > 0) {
-            Text(
-                text = stringResource(R.string.reaction_false_starts, uiState.falseStarts),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        reactionsMs.forEachIndexed { i, ms ->
+            val isBest = ms == best
+            Column(
+                modifier = Modifier
+                    .background(NightDeep, RoundedCornerShape(14.dp))
+                    .border(2.dp, if (isBest) Sun else NightLight, RoundedCornerShape(14.dp))
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.reaction_attempt_n, i + 1),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (isBest) Sun else Lavender,
+                )
+                Text(text = ms.toString(), style = MaterialTheme.typography.titleMedium, color = Color.White)
+            }
         }
-        Text(
-            text = stringResource(R.string.reaction_disclaimer),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun ReactionWaitingPreview() {
+private fun FinishedContent(uiState: ReactionUiState, modifier: Modifier = Modifier) {
+    GamePanel(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+        ) {
+            Text(stringResource(R.string.reaction_median), style = MaterialTheme.typography.titleLarge, color = Lavender)
+            Text(
+                text = stringResource(R.string.unit_ms, uiState.medianMs ?: 0L),
+                style = MaterialTheme.typography.displayMedium,
+                color = Sun,
+            )
+            AttemptChips(uiState.reactionsMs)
+            if (uiState.falseStarts > 0) {
+                Text(
+                    text = stringResource(R.string.reaction_false_starts, uiState.falseStarts),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Lavender,
+                )
+            }
+            Text(
+                text = stringResource(R.string.reaction_disclaimer),
+                style = MaterialTheme.typography.bodySmall,
+                color = Lavender,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun ReactionGoPreview() {
     BrainUpTheme {
         ReactionContent(
-            uiState = ReactionUiState(phase = ReactionPhase.Waiting, reactionsMs = listOf(312, 287)),
+            uiState = ReactionUiState(phase = ReactionPhase.Go, reactionsMs = listOf(312, 287)),
             onBack = {},
             onTap = {},
             onShowResult = {},
@@ -272,7 +305,7 @@ private fun ReactionWaitingPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun ReactionFinishedPreview() {
     BrainUpTheme {
