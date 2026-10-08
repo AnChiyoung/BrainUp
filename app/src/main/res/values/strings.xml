@@ -21,4 +21,31 @@
     <string name="game_pattern_desc">빛난 타일을 같은 순서로 터치하세요</string>
 
     <string name="placeholder_coming_soon">준비 중입니다</string>
+
+    <string name="action_start">시작</string>
+    <string name="action_delete">지우기</string>
+    <string name="action_show_result">결과 보기</string>
+    <string name="action_retry">다시 도전</string>
+    <string name="action_next_game">다음 게임: %1$s</string>
+    <string name="action_home">홈으로</string>
+
+    <string name="label_round">라운드</string>
+    <string name="label_level">레벨</string>
+    <string name="label_score">점수</string>
+
+    <string name="number_memory_ready">준비되면 시작을 누르세요</string>
+    <string name="number_memory_rules">화면에 잠깐 나타나는 숫자를 기억한 뒤\n같은 순서대로 입력하세요.\n\n라운드를 통과할수록 숫자가 늘어납니다.</string>
+    <string name="number_memory_memorizing">숫자를 기억하세요</string>
+    <string name="number_memory_answering">본 순서대로 입력하세요</string>
+    <string name="number_memory_success">다음 라운드로!</string>
+    <string name="number_memory_finished">아쉬워요, 게임이 끝났습니다</string>
+    <string name="number_memory_correct">정답!</string>
+    <string name="number_memory_wrong">틀렸어요</string>
+    <string name="number_memory_answer">정답</string>
+    <string name="number_memory_your_input">내 입력</string>
+
+    <string name="result_score">최종 점수</string>
+    <string name="result_rounds_cleared">성공 라운드</string>
+    <string name="result_level">최고 레벨</string>
+    <string name="result_duration">플레이 시간</string>
 </resources>
