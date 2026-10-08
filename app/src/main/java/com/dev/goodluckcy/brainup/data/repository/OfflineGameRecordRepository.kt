@@ -39,11 +39,12 @@ class OfflineGameRecordRepository @Inject constructor(
             .fold(0) { acc, gameType -> acc or gameType.bit }
         val completed = mask == GameType.ALL_COMPLETED_MASK
         val wasCompleted = dailyProgressDao.get(date.toString())?.completed == true
+        val totalScore = todayBest.sumOf { it.bestScore }
         dailyProgressDao.upsert(
             DailyProgressEntity(
                 date = date.toString(),
                 completedMask = mask,
-                totalScore = todayBest.sumOf { it.bestScore },
+                totalScore = totalScore,
                 completed = completed,
             ),
         )
@@ -53,6 +54,7 @@ class OfflineGameRecordRepository @Inject constructor(
             previousBestScore = previousBest,
             dailyCompletedNow = completed && !wasCompleted,
             todayCompletedCount = Integer.bitCount(mask),
+            todayTotalScore = totalScore,
         )
     }
 

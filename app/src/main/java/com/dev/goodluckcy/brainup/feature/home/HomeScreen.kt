@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
+import com.dev.goodluckcy.brainup.core.ads.BannerAd
 import com.dev.goodluckcy.brainup.core.designsystem.descriptionRes
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.core.designsystem.titleRes
@@ -78,7 +79,8 @@ private fun HomeContent(
         )
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -102,8 +104,8 @@ private fun HomeContent(
                     onClick = { onGameClick(gameType) },
                 )
             }
-            // TODO(Day 8~10): 홈 하단 배너 광고 영역
         }
+        BannerAd()
     }
 }
 

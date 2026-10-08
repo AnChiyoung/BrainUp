@@ -5,6 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.dev.goodluckcy.brainup.core.ads.AdFrequencyStore
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsLogger
 import com.dev.goodluckcy.brainup.core.common.di.ApplicationScope
 import com.dev.goodluckcy.brainup.core.navigation.ResultRoute
 import com.dev.goodluckcy.brainup.domain.model.GameResult
@@ -30,6 +33,8 @@ data class ResultUiState(
 class ResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     repository: GameRecordRepository,
+    analytics: AnalyticsLogger,
+    adFrequencyStore: AdFrequencyStore,
     @ApplicationScope applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -42,16 +47,23 @@ class ResultViewModel @Inject constructor(
         // 화면 회전·프로세스 재생성 시 중복 저장하지 않는다.
         if (savedStateHandle.get<Boolean>(KEY_SAVED) != true) {
             savedStateHandle[KEY_SAVED] = true
+            val result = _uiState.value.result
+            analytics.log(AnalyticsEvent.gameComplete(result.gameType, result.score))
             // 결과 화면을 바로 떠나도 저장이 취소되지 않도록 앱 스코프에서 실행한다.
             val saving = applicationScope.async {
-                runCatching { repository.record(_uiState.value.result) }
+                adFrequencyStore.onGameCompleted()
+                runCatching { repository.record(result) }
                     .onFailure { Log.e(TAG, "Failed to save game result", it) }
                     .getOrNull()
+                    ?.also { outcome ->
+                        if (outcome.dailyCompletedNow) {
+                            analytics.log(AnalyticsEvent.dailyComplete(outcome.todayTotalScore))
+                        }
+                    }
             }
             viewModelScope.launch {
                 saving.await()?.let { outcome -> _uiState.update { it.copy(outcome = outcome) } }
             }
-            // TODO(Day 8~10): game_complete Analytics 이벤트 전송
         }
     }
 

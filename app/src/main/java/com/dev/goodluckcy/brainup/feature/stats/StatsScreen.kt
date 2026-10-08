@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
+import com.dev.goodluckcy.brainup.core.ads.BannerAd
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.core.designsystem.titleRes
 import com.dev.goodluckcy.brainup.domain.model.BestRecord
@@ -42,7 +43,6 @@ import com.dev.goodluckcy.brainup.domain.model.DailyProgress
 import com.dev.goodluckcy.brainup.domain.model.GameType
 import java.time.LocalDate
 
-// TODO(Day 8~10): 기록 하단 네이티브/배너 광고 영역
 @Composable
 fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel(),
@@ -56,20 +56,23 @@ fun StatsScreen(
 private fun StatsContent(uiState: StatsUiState) {
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(title = { Text(stringResource(R.string.nav_stats), fontWeight = FontWeight.Bold) })
-        if (uiState.isLoading) return@Column
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            StreakCard(uiState)
-            SectionTitle(stringResource(R.string.stats_best_records))
-            BestRecordsCard(uiState.bestRecords)
-            SectionTitle(stringResource(R.string.stats_recent_days))
-            RecentDaysCard(uiState.recentDays)
+            if (!uiState.isLoading) {
+                StreakCard(uiState)
+                SectionTitle(stringResource(R.string.stats_best_records))
+                BestRecordsCard(uiState.bestRecords)
+                SectionTitle(stringResource(R.string.stats_recent_days))
+                RecentDaysCard(uiState.recentDays)
+            }
         }
+        BannerAd()
     }
 }
 

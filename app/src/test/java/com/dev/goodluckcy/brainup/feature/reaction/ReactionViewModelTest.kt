@@ -1,6 +1,8 @@
 package com.dev.goodluckcy.brainup.feature.reaction
 
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
 import com.dev.goodluckcy.brainup.domain.model.GameType
+import com.dev.goodluckcy.brainup.testing.FakeAnalyticsLogger
 import com.dev.goodluckcy.brainup.testing.FakeMonotonicClock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,12 +25,13 @@ class ReactionViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
     private val clock = FakeMonotonicClock()
+    private val analytics = FakeAnalyticsLogger()
     private lateinit var viewModel: ReactionViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        viewModel = ReactionViewModel(ReactionEngine(Random(seed = 5)), clock)
+        viewModel = ReactionViewModel(ReactionEngine(Random(seed = 5)), clock, analytics)
     }
 
     @After
@@ -112,5 +115,12 @@ class ReactionViewModelTest {
 
         assertEquals(ReactionPhase.Ready, state.phase)
         assertEquals(listOf(300L), state.reactionsMs)
+    }
+
+    @Test
+    fun `game start is logged once on first tap`() = runTest(dispatcher) {
+        react(300)
+        react(300)
+        assertEquals(listOf(AnalyticsEvent.gameStart(GameType.REACTION)), analytics.events)
     }
 }

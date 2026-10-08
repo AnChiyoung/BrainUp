@@ -2,6 +2,8 @@ package com.dev.goodluckcy.brainup.feature.pattern
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsLogger
 import com.dev.goodluckcy.brainup.core.common.MonotonicClock
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
@@ -24,6 +26,7 @@ import javax.inject.Inject
 class PatternMemoryViewModel @Inject constructor(
     private val engine: PatternMemoryEngine,
     private val clock: MonotonicClock,
+    private val analytics: AnalyticsLogger,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PatternMemoryUiState())
@@ -38,7 +41,16 @@ class PatternMemoryViewModel @Inject constructor(
     fun start() {
         if (_uiState.value.phase != GamePhase.Ready) return
         startedAtMs = clock.elapsedRealtimeMs()
+        analytics.log(AnalyticsEvent.gameStart(GameType.PATTERN))
         startRound(round = 1, sequence = engine.initialSequence())
+    }
+
+    /** 보상형 광고 시청 후 같은 패턴을 처음부터 다시 보여주고 현재 라운드를 다시 진행한다. */
+    fun continueAfterReward() {
+        val state = _uiState.value
+        if (!state.canContinue) return
+        _uiState.update { it.copy(continueUsed = true, wrongTile = null, expectedTile = null) }
+        startRound(round = state.round, sequence = state.sequence)
     }
 
     fun onTileTap(tile: Int) {

@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.domain.model.GameResult
+import com.dev.goodluckcy.brainup.feature.game.ContinueWithAdButton
 import com.dev.goodluckcy.brainup.feature.game.GamePhase
 
 @Composable
@@ -65,6 +66,7 @@ fun PatternMemoryScreen(
         onStart = viewModel::start,
         onTileTap = viewModel::onTileTap,
         onShowResult = { onFinish(viewModel.result()) },
+        onContinue = viewModel::continueAfterReward,
     )
 }
 
@@ -76,6 +78,7 @@ private fun PatternMemoryContent(
     onStart: () -> Unit,
     onTileTap: (Int) -> Unit,
     onShowResult: () -> Unit,
+    onContinue: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -121,7 +124,10 @@ private fun PatternMemoryContent(
             }
             when (uiState.phase) {
                 GamePhase.Ready -> PrimaryButton(stringResource(R.string.action_start), onStart)
-                GamePhase.Finished -> PrimaryButton(stringResource(R.string.action_show_result), onShowResult)
+                GamePhase.Finished -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ContinueWithAdButton(canContinue = uiState.canContinue, onContinue = onContinue)
+                    PrimaryButton(stringResource(R.string.action_show_result), onShowResult)
+                }
                 else -> Spacer(Modifier.height(BUTTON_HEIGHT))
             }
             Spacer(Modifier.height(8.dp))
@@ -270,6 +276,7 @@ private fun PatternMemoryPlaybackPreview() {
             onStart = {},
             onTileTap = {},
             onShowResult = {},
+            onContinue = {},
         )
     }
 }
@@ -293,6 +300,7 @@ private fun PatternMemoryFinishedPreview() {
             onStart = {},
             onTileTap = {},
             onShowResult = {},
+            onContinue = {},
         )
     }
 }

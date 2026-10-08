@@ -20,7 +20,6 @@
     <string name="game_pattern">패턴 기억</string>
     <string name="game_pattern_desc">빛난 타일을 같은 순서로 터치하세요</string>
 
-    <string name="placeholder_coming_soon">준비 중입니다</string>
 
     <string name="action_start">시작</string>
     <string name="action_delete">지우기</string>
@@ -28,6 +27,7 @@
     <string name="action_retry">다시 도전</string>
     <string name="action_next_game">다음 게임: %1$s</string>
     <string name="action_home">홈으로</string>
+    <string name="action_continue_with_ad">▶ 광고 보고 한 번 더 도전</string>
 
     <string name="label_round">라운드</string>
     <string name="label_level">레벨</string>
@@ -100,6 +100,13 @@
         <item>토</item>
         <item>일</item>
     </string-array>
+
+    <string name="settings_section_ads">광고</string>
+    <string name="settings_ad_privacy">광고 개인정보 설정</string>
+    <string name="settings_ad_privacy_desc">맞춤 광고 동의 여부를 변경합니다</string>
+    <string name="settings_ad_privacy_not_required">현재 지역에서는 별도 설정이 필요하지 않아요</string>
+    <string name="settings_section_app">앱 정보</string>
+    <string name="settings_version">버전</string>
 
     <string name="result_max_pattern_length">최대 기억 길이</string>
     <string name="result_score">최종 점수</string>

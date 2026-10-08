@@ -1,5 +1,7 @@
 package com.dev.goodluckcy.brainup.feature.result
 
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,13 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
+import com.dev.goodluckcy.brainup.core.ads.LocalAdServices
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.core.designsystem.titleRes
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
 import com.dev.goodluckcy.brainup.domain.model.RecordOutcome
 
-// TODO(Day 8~10): 결과 확인 후 화면 전환 시 전면 광고 조건 검사
 @Composable
 fun ResultScreen(
     onRetry: (GameType) -> Unit,
@@ -43,11 +48,27 @@ fun ResultScreen(
     viewModel: ResultViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val adServices = LocalAdServices.current
+    val activity = LocalActivity.current
+    var isLeaving by remember { mutableStateOf(false) }
+
+    // 결과를 확인한 뒤 다음 화면으로 넘어가는 시점에만 전면 광고를 검토한다.
+    fun leave(navigate: () -> Unit) {
+        if (isLeaving) return
+        isLeaving = true
+        if (adServices != null && activity != null) {
+            adServices.interstitial.showIfEligible(activity, navigate)
+        } else {
+            navigate()
+        }
+    }
+
+    BackHandler { leave(onHome) }
     ResultContent(
         uiState = uiState,
-        onRetry = { onRetry(uiState.result.gameType) },
-        onNextGame = onNextGame,
-        onHome = onHome,
+        onRetry = { leave { onRetry(uiState.result.gameType) } },
+        onNextGame = { gameType -> leave { onNextGame(gameType) } },
+        onHome = { leave(onHome) },
     )
 }
 
@@ -231,6 +252,7 @@ private fun ResultContentPreview() {
                     previousBestScore = 120,
                     dailyCompletedNow = false,
                     todayCompletedCount = 2,
+                    todayTotalScore = 870,
                 ),
             ),
             onRetry = {},

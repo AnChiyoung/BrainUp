@@ -18,6 +18,9 @@ data class PatternMemoryUiState(
     /** 종료 시 눌러야 했던 타일 */
     val expectedTile: Int? = null,
     val durationMs: Long = 0L,
+    /** 보상형 광고로 이어하기를 이미 사용했으면 true(게임당 1회) */
+    val continueUsed: Boolean = false,
 ) {
     val isInputEnabled: Boolean get() = phase == GamePhase.Answering
+    val canContinue: Boolean get() = phase == GamePhase.Finished && !continueUsed
 }

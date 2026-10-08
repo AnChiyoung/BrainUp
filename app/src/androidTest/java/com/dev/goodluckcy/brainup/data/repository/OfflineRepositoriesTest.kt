@@ -123,6 +123,7 @@ class OfflineRepositoriesTest {
         val completing = gameRecords.record(result(GameType.PATTERN, 10))
         assertTrue(completing.dailyCompletedNow)
         assertEquals(3, completing.todayCompletedCount)
+        assertEquals(30, completing.todayTotalScore)
 
         val again = gameRecords.record(result(GameType.PATTERN, 20))
         assertFalse(again.dailyCompletedNow)

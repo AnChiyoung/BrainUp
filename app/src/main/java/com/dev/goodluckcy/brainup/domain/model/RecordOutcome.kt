@@ -8,4 +8,6 @@ data class RecordOutcome(
     /** 이번 기록으로 오늘의 도전이 처음 완료되었으면 true */
     val dailyCompletedNow: Boolean,
     val todayCompletedCount: Int,
+    /** 오늘 게임별 최고 점수의 합 */
+    val todayTotalScore: Int,
 )

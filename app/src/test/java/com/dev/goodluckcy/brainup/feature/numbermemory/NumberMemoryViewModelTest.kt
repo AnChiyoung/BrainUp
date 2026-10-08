@@ -2,6 +2,8 @@ package com.dev.goodluckcy.brainup.feature.numbermemory
 
 import com.dev.goodluckcy.brainup.domain.model.GameType
 import com.dev.goodluckcy.brainup.feature.game.GamePhase
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
+import com.dev.goodluckcy.brainup.testing.FakeAnalyticsLogger
 import com.dev.goodluckcy.brainup.testing.FakeMonotonicClock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,12 +26,13 @@ class NumberMemoryViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
     private val clock = FakeMonotonicClock()
+    private val analytics = FakeAnalyticsLogger()
     private lateinit var viewModel: NumberMemoryViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        viewModel = NumberMemoryViewModel(NumberMemoryEngine(Random(seed = 7)), clock)
+        viewModel = NumberMemoryViewModel(NumberMemoryEngine(Random(seed = 7)), clock, analytics)
     }
 
     @After
@@ -153,5 +156,46 @@ class NumberMemoryViewModelTest {
         viewModel.onStart()
         finishMemorizing()
         assertEquals(GamePhase.Answering, state.phase)
+    }
+
+    @Test
+    fun `game start is logged when started`() = runTest(dispatcher) {
+        viewModel.start()
+        viewModel.start()
+        assertEquals(listOf(AnalyticsEvent.gameStart(GameType.NUMBER_MEMORY)), analytics.events)
+    }
+
+    @Test
+    fun `continue after reward retries same round with new digits once`() = runTest(dispatcher) {
+        viewModel.start()
+        finishMemorizing()
+        enter(state.sequence)
+        advanceTimeBy(NumberMemoryViewModel.SUCCESS_FEEDBACK_MS)
+        runCurrent()
+        finishMemorizing()
+        enter(state.sequence.map { (it + 1) % 10 })
+        assertEquals(GamePhase.Finished, state.phase)
+        assertEquals(true, state.canContinue)
+
+        viewModel.continueAfterReward()
+        assertEquals(GamePhase.Memorizing, state.phase)
+        assertEquals(2, state.round)
+        assertEquals(3, state.sequence.size)
+        assertEquals(30, state.score)
+        assertEquals(emptyList<Int>(), state.input)
+
+        finishMemorizing()
+        enter(state.sequence.map { (it + 1) % 10 })
+        assertEquals(GamePhase.Finished, state.phase)
+        assertEquals(false, state.canContinue)
+        viewModel.continueAfterReward()
+        assertEquals(GamePhase.Finished, state.phase)
+    }
+
+    @Test
+    fun `continue is ignored before game finishes`() = runTest(dispatcher) {
+        viewModel.start()
+        viewModel.continueAfterReward()
+        assertEquals(false, state.continueUsed)
     }
 }

@@ -2,6 +2,8 @@ package com.dev.goodluckcy.brainup.feature.reaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsLogger
 import com.dev.goodluckcy.brainup.core.common.MonotonicClock
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
@@ -23,6 +25,7 @@ import javax.inject.Inject
 class ReactionViewModel @Inject constructor(
     private val engine: ReactionEngine,
     private val clock: MonotonicClock,
+    private val analytics: AnalyticsLogger,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReactionUiState())
@@ -69,7 +72,10 @@ class ReactionViewModel @Inject constructor(
     }
 
     private fun startWaiting() {
-        if (startedAtMs == null) startedAtMs = clock.elapsedRealtimeMs()
+        if (startedAtMs == null) {
+            startedAtMs = clock.elapsedRealtimeMs()
+            analytics.log(AnalyticsEvent.gameStart(GameType.REACTION))
+        }
         _uiState.update { it.copy(phase = ReactionPhase.Waiting) }
         waitJob?.cancel()
         waitJob = viewModelScope.launch {

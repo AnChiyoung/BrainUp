@@ -2,6 +2,8 @@ package com.dev.goodluckcy.brainup.feature.pattern
 
 import com.dev.goodluckcy.brainup.domain.model.GameType
 import com.dev.goodluckcy.brainup.feature.game.GamePhase
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
+import com.dev.goodluckcy.brainup.testing.FakeAnalyticsLogger
 import com.dev.goodluckcy.brainup.testing.FakeMonotonicClock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,12 +27,13 @@ class PatternMemoryViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
     private val clock = FakeMonotonicClock()
+    private val analytics = FakeAnalyticsLogger()
     private lateinit var viewModel: PatternMemoryViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        viewModel = PatternMemoryViewModel(PatternMemoryEngine(Random(seed = 13)), clock)
+        viewModel = PatternMemoryViewModel(PatternMemoryEngine(Random(seed = 13)), clock, analytics)
     }
 
     @After
@@ -160,5 +163,37 @@ class PatternMemoryViewModelTest {
         runCurrent()
         assertEquals(sequence[0], state.litTile)
         finishPlayback()
+    }
+
+    @Test
+    fun `game start is logged when started`() = runTest(dispatcher) {
+        viewModel.start()
+        assertEquals(listOf(AnalyticsEvent.gameStart(GameType.PATTERN)), analytics.events)
+    }
+
+    @Test
+    fun `continue after reward replays same pattern once`() = runTest(dispatcher) {
+        viewModel.start()
+        finishPlayback()
+        val sequence = state.sequence
+        viewModel.onTileTap(wrongTileFor(0))
+        assertEquals(true, state.canContinue)
+
+        viewModel.continueAfterReward()
+        assertEquals(GamePhase.Memorizing, state.phase)
+        assertEquals(sequence, state.sequence)
+        assertEquals(0, state.inputCount)
+        assertNull(state.wrongTile)
+        assertNull(state.expectedTile)
+
+        finishPlayback()
+        sequence.forEach(viewModel::onTileTap)
+        assertEquals(GamePhase.Success, state.phase)
+        assertEquals(1, state.roundsCleared)
+
+        advanceTimeBy(PatternMemoryViewModel.SUCCESS_FEEDBACK_MS)
+        finishPlayback()
+        viewModel.onTileTap(wrongTileFor(0))
+        assertEquals(false, state.canContinue)
     }
 }

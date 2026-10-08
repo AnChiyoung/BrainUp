@@ -2,6 +2,8 @@ package com.dev.goodluckcy.brainup.feature.numbermemory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
+import com.dev.goodluckcy.brainup.core.analytics.AnalyticsLogger
 import com.dev.goodluckcy.brainup.core.common.MonotonicClock
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
@@ -24,6 +26,7 @@ import javax.inject.Inject
 class NumberMemoryViewModel @Inject constructor(
     private val engine: NumberMemoryEngine,
     private val clock: MonotonicClock,
+    private val analytics: AnalyticsLogger,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NumberMemoryUiState())
@@ -37,7 +40,16 @@ class NumberMemoryViewModel @Inject constructor(
     fun start() {
         if (_uiState.value.phase != GamePhase.Ready) return
         startedAtMs = clock.elapsedRealtimeMs()
+        analytics.log(AnalyticsEvent.gameStart(GameType.NUMBER_MEMORY))
         startRound(round = 1)
+    }
+
+    /** 보상형 광고 시청 후 같은 길이의 새 숫자로 현재 라운드를 다시 진행한다. */
+    fun continueAfterReward() {
+        val state = _uiState.value
+        if (!state.canContinue) return
+        _uiState.update { it.copy(continueUsed = true) }
+        startRound(state.round)
     }
 
     fun onDigit(digit: Int) {
