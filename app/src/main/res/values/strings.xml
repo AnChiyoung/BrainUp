@@ -23,6 +23,8 @@
 
 
     <string name="action_start">시작</string>
+    <string name="ad_loading">광고 로딩 중! 저도 먹고 살아야지요ㅠㅠ</string>
+    <string name="ad_label">AD</string>
     <string name="ribbon_ready">준비!</string>
     <string name="ribbon_round_level">ROUND %1$d · Lv.%2$d</string>
     <string name="ribbon_round_length">ROUND %1$d · %2$d칸</string>
