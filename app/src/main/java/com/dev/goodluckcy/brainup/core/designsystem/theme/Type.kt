@@ -1,4 +1,4 @@
-package com.dev.goodluckcy.brainup.ui.theme
+package com.dev.goodluckcy.brainup.core.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
