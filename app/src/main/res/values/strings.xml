@@ -44,6 +44,22 @@
     <string name="number_memory_answer">정답</string>
     <string name="number_memory_your_input">내 입력</string>
 
+    <string name="unit_ms">%1$d ms</string>
+    <string name="reaction_attempt">시도</string>
+    <string name="reaction_best">최고 기록</string>
+    <string name="reaction_median">중앙값</string>
+    <string name="reaction_tap_to_start">탭하여 시작</string>
+    <string name="reaction_rules">화면이 초록색으로 바뀌는 순간\n최대한 빨리 터치하세요.\n총 5번 측정합니다.</string>
+    <string name="reaction_tap_to_resume">탭하여 계속</string>
+    <string name="reaction_wait">기다리세요…</string>
+    <string name="reaction_wait_hint">초록색으로 바뀌면 바로 터치</string>
+    <string name="reaction_go">터치!</string>
+    <string name="reaction_too_early">너무 빨랐어요</string>
+    <string name="reaction_too_early_hint">이번 시도는 기록되지 않아요\n탭하여 다시 시도</string>
+    <string name="reaction_tap_to_continue">탭하여 다음 시도</string>
+    <string name="reaction_false_starts">너무 빨리 누른 횟수: %1$d</string>
+    <string name="reaction_disclaimer">기기의 화면·터치 지연이 포함된 참고용 기록입니다.</string>
+
     <string name="result_score">최종 점수</string>
     <string name="result_rounds_cleared">성공 라운드</string>
     <string name="result_level">최고 레벨</string>

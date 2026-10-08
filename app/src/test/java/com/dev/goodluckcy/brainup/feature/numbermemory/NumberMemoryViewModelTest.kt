@@ -1,8 +1,8 @@
 package com.dev.goodluckcy.brainup.feature.numbermemory
 
-import com.dev.goodluckcy.brainup.core.common.MonotonicClock
 import com.dev.goodluckcy.brainup.domain.model.GameType
 import com.dev.goodluckcy.brainup.feature.game.GamePhase
+import com.dev.goodluckcy.brainup.testing.FakeMonotonicClock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -23,7 +23,7 @@ import kotlin.random.Random
 class NumberMemoryViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
-    private val clock = FakeClock()
+    private val clock = FakeMonotonicClock()
     private lateinit var viewModel: NumberMemoryViewModel
 
     @Before
@@ -153,11 +153,5 @@ class NumberMemoryViewModelTest {
         viewModel.onStart()
         finishMemorizing()
         assertEquals(GamePhase.Answering, state.phase)
-    }
-
-    private class FakeClock : MonotonicClock {
-        var nowMs = 0L
-        override fun elapsedRealtimeMs(): Long = nowMs
-        override fun elapsedRealtimeNanos(): Long = nowMs * 1_000_000
     }
 }

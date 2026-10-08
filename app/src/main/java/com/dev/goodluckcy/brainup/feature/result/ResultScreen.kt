@@ -74,8 +74,13 @@ fun ResultScreen(
                         .padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    StatItem(stringResource(R.string.result_rounds_cleared), result.roundsCleared.toString())
-                    StatItem(stringResource(R.string.result_level), result.level.toString())
+                    if (result.medianReactionMs != null && result.bestReactionMs != null) {
+                        StatItem(stringResource(R.string.reaction_median), stringResource(R.string.unit_ms, result.medianReactionMs))
+                        StatItem(stringResource(R.string.reaction_best), stringResource(R.string.unit_ms, result.bestReactionMs))
+                    } else {
+                        StatItem(stringResource(R.string.result_rounds_cleared), result.roundsCleared.toString())
+                        StatItem(stringResource(R.string.result_level), result.level.toString())
+                    }
                     StatItem(stringResource(R.string.result_duration), formatDuration(result.durationMs))
                 }
             }

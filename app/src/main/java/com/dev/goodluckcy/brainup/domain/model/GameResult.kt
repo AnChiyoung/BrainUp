@@ -7,4 +7,8 @@ data class GameResult(
     val level: Int,
     val roundsCleared: Int,
     val durationMs: Long,
+    /** 반응 속도 게임 전용: 유효 시도의 중앙값 */
+    val medianReactionMs: Long? = null,
+    /** 반응 속도 게임 전용: 유효 시도 중 최단 시간 */
+    val bestReactionMs: Long? = null,
 )

@@ -23,8 +23,18 @@ data class ResultRoute(
     val level: Int,
     val roundsCleared: Int,
     val durationMs: Long,
+    val medianReactionMs: Long? = null,
+    val bestReactionMs: Long? = null,
 ) {
-    fun toGameResult() = GameResult(gameType, score, level, roundsCleared, durationMs)
+    fun toGameResult() = GameResult(
+        gameType = gameType,
+        score = score,
+        level = level,
+        roundsCleared = roundsCleared,
+        durationMs = durationMs,
+        medianReactionMs = medianReactionMs,
+        bestReactionMs = bestReactionMs,
+    )
 
     companion object {
         fun from(result: GameResult) = ResultRoute(
@@ -33,6 +43,8 @@ data class ResultRoute(
             level = result.level,
             roundsCleared = result.roundsCleared,
             durationMs = result.durationMs,
+            medianReactionMs = result.medianReactionMs,
+            bestReactionMs = result.bestReactionMs,
         )
     }
 }
