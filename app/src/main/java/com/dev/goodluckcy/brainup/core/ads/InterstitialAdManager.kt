@@ -17,6 +17,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Clock
@@ -35,6 +36,7 @@ class InterstitialAdManager @Inject constructor(
 ) {
     private var interstitialAd: InterstitialAd? = null
     private var isLoading = false
+    private val retry = AdLoadRetry()
 
     init {
         applicationScope.launch(Dispatchers.Main) {
@@ -95,6 +97,7 @@ class InterstitialAdManager @Inject constructor(
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
+                    retry.reset()
                     interstitialAd = ad
                     isLoading = false
                 }
@@ -102,9 +105,17 @@ class InterstitialAdManager @Inject constructor(
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     Log.w(TAG, "Interstitial failed to load: ${error.message}")
                     isLoading = false
+                    scheduleRetry()
                 }
             },
         )
+    }
+
+    private fun scheduleRetry() {
+        applicationScope.launch(Dispatchers.Main) {
+            delay(retry.nextDelay())
+            load()
+        }
     }
 
     private companion object {

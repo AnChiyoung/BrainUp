@@ -5,6 +5,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -31,7 +33,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -228,16 +233,44 @@ private fun MemorizingContent(uiState: NumberMemoryUiState) {
 
 @Composable
 private fun InputSlots(input: List<Int>, length: Int) {
-    val text = buildString {
-        for (i in 0 until length) append(input.getOrNull(i)?.toString() ?: "_")
+    val colors = MaterialTheme.colorScheme
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        val gap = 6.dp
+        // 자릿수가 많아도 한 줄에 들어가도록 칸 너비를 줄인다.
+        val slotWidth = ((maxWidth - gap * (length - 1)) / length).coerceAtMost(MAX_SLOT_WIDTH)
+        val fontSize = with(LocalDensity.current) { (slotWidth * 0.6f).toSp() }
+        Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+            for (i in 0 until length) {
+                val digit = input.getOrNull(i)
+                val isNext = i == input.size
+                Box(
+                    modifier = Modifier
+                        .width(slotWidth)
+                        .height(slotWidth * 1.3f)
+                        .drawBehind {
+                            val stroke = 3.dp.toPx()
+                            drawLine(
+                                color = if (isNext) colors.primary else colors.outlineVariant,
+                                start = Offset(0f, size.height - stroke / 2),
+                                end = Offset(size.width, size.height - stroke / 2),
+                                strokeWidth = stroke,
+                            )
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (digit != null) {
+                        Text(text = digit.toString(), fontSize = fontSize, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
     }
-    Text(
-        text = text,
-        fontSize = digitFontSize(length),
-        fontWeight = FontWeight.Bold,
-        letterSpacing = 4.sp,
-    )
 }
+
+private val MAX_SLOT_WIDTH = 48.dp
 
 @Composable
 private fun FeedbackText(text: String, color: Color) {

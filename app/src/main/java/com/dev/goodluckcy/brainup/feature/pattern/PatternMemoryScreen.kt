@@ -5,16 +5,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -114,13 +114,16 @@ private fun PatternMemoryContent(
                 },
                 textAlign = TextAlign.Center,
             )
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                TileGrid(uiState = uiState, onTileTap = onTileTap)
+                // 작은 화면에서도 위아래 요소와 겹치지 않도록 너비·높이 중 작은 쪽에 맞춘다.
+                val side = minOf(maxWidth, maxHeight, MAX_GRID_SIZE)
+                TileGrid(uiState = uiState, onTileTap = onTileTap, modifier = Modifier.size(side))
             }
             when (uiState.phase) {
                 GamePhase.Ready -> PrimaryButton(stringResource(R.string.action_start), onStart)
@@ -183,13 +186,11 @@ private fun StatusItem(label: String, value: String) {
 private fun TileGrid(
     uiState: PatternMemoryUiState,
     onTileTap: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val size = PatternMemoryEngine.GRID_SIZE
     Column(
-        modifier = Modifier
-            .widthIn(max = 420.dp)
-            .fillMaxWidth()
-            .aspectRatio(1f),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         for (row in 0 until size) {
@@ -259,6 +260,7 @@ private fun PrimaryButton(text: String, onClick: () -> Unit) {
 }
 
 private val BUTTON_HEIGHT = 56.dp
+private val MAX_GRID_SIZE = 420.dp
 
 @Preview(showBackground = true)
 @Composable

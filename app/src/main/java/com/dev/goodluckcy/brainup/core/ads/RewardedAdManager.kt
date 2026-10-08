@@ -18,6 +18,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,7 @@ class RewardedAdManager @Inject constructor(
 ) {
     private var rewardedAd: RewardedAd? = null
     private var isLoading = false
+    private val retry = AdLoadRetry()
 
     private val _isLoaded = MutableStateFlow(false)
     val isLoaded: StateFlow<Boolean> = _isLoaded.asStateFlow()
@@ -86,6 +88,7 @@ class RewardedAdManager @Inject constructor(
             AdRequest.Builder().build(),
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(ad: RewardedAd) {
+                    retry.reset()
                     rewardedAd = ad
                     isLoading = false
                     _isLoaded.value = true
@@ -94,9 +97,17 @@ class RewardedAdManager @Inject constructor(
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     Log.w(TAG, "Rewarded failed to load: ${error.message}")
                     isLoading = false
+                    scheduleRetry()
                 }
             },
         )
+    }
+
+    private fun scheduleRetry() {
+        applicationScope.launch(Dispatchers.Main) {
+            delay(retry.nextDelay())
+            load()
+        }
     }
 
     private companion object {
