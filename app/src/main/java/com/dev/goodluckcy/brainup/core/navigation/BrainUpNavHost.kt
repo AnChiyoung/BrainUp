@@ -48,16 +48,14 @@ fun BrainUpNavHost(
                 GameType.PATTERN -> PatternMemoryScreen(onBack = onBack, onFinish = onFinish)
             }
         }
-        composable<ResultRoute> { entry ->
-            val result = entry.toRoute<ResultRoute>().toGameResult()
+        composable<ResultRoute> {
             val playGame: (GameType) -> Unit = { gameType ->
                 navController.navigate(GameRoute(gameType)) {
                     popUpTo<ResultRoute> { inclusive = true }
                 }
             }
             ResultScreen(
-                result = result,
-                onRetry = { playGame(result.gameType) },
+                onRetry = playGame,
                 onNextGame = playGame,
                 onHome = { navController.popBackStack<HomeRoute>(inclusive = false) },
             )

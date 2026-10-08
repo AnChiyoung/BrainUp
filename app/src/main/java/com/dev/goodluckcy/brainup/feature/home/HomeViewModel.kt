@@ -1,16 +1,32 @@
 package com.dev.goodluckcy.brainup.feature.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.dev.goodluckcy.brainup.domain.repository.DailyChallengeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-// TODO(Day 6~7): DailyProgress Repository(Room)를 주입해 오늘의 완료 상태를 구독한다.
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    dailyChallengeRepository: DailyChallengeRepository,
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<HomeUiState> = combine(
+        dailyChallengeRepository.observeToday(),
+        dailyChallengeRepository.observeStreak(),
+    ) { today, streak ->
+        HomeUiState(
+            completedGames = today.completedGames,
+            todayScore = today.totalScore,
+            streakDays = streak,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = HomeUiState(),
+    )
 }

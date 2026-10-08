@@ -120,11 +120,21 @@ private fun DailyChallengeCard(uiState: HomeUiState) {
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(
-                text = stringResource(R.string.home_daily_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.home_daily_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
+                if (uiState.streakDays > 0) {
+                    Text(
+                        text = stringResource(R.string.streak_days, uiState.streakDays),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
             Text(
                 text = if (uiState.isDailyCompleted) {
                     stringResource(R.string.home_daily_done)
@@ -137,6 +147,12 @@ private fun DailyChallengeCard(uiState: HomeUiState) {
                 progress = { uiState.completedCount.toFloat() / uiState.totalCount },
                 modifier = Modifier.fillMaxWidth(),
             )
+            if (uiState.todayScore > 0) {
+                Text(
+                    text = stringResource(R.string.home_today_score, uiState.todayScore),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
     }
 }
@@ -186,7 +202,11 @@ private fun GameCard(
 private fun HomeContentPreview() {
     BrainUpTheme {
         HomeContent(
-            uiState = HomeUiState(completedGames = setOf(GameType.REACTION)),
+            uiState = HomeUiState(
+                completedGames = setOf(GameType.REACTION),
+                todayScore = 712,
+                streakDays = 4,
+            ),
             onGameClick = {},
             onSettingsClick = {},
         )

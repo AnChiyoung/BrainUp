@@ -68,6 +68,39 @@
     <string name="pattern_length">길이</string>
     <string name="pattern_tile">타일 %1$d</string>
 
+    <string name="result_first_record">첫 기록이에요!</string>
+    <string name="result_new_best">🏆 개인 최고 기록 갱신! (이전 %1$d점)</string>
+    <string name="result_best_score">내 최고 기록: %1$d점</string>
+    <string name="result_daily_completed_now">🎉 오늘의 도전 완료!</string>
+    <string name="result_daily_progress">오늘의 도전 %1$d/%2$d</string>
+
+    <string name="streak_days">🔥 %1$d일 연속</string>
+    <string name="home_today_score">오늘 점수 %1$d점</string>
+
+    <string name="stats_streak_title">연속 완료</string>
+    <string name="stats_streak_value">%1$d일</string>
+    <string name="stats_streak_today_done">오늘의 도전 완료! 내일도 이어가세요</string>
+    <string name="stats_streak_keep">오늘의 도전을 완료하면 %1$d일이 돼요</string>
+    <string name="stats_streak_start">오늘의 도전을 완료해 연속 기록을 시작하세요</string>
+    <string name="stats_best_records">게임별 최고 기록</string>
+    <string name="stats_no_record">아직 기록이 없어요</string>
+    <string name="stats_best_number_memory">%1$d점 · 레벨 %2$d</string>
+    <string name="stats_best_reaction">%1$d점 · %2$d ms</string>
+    <string name="stats_best_pattern">%1$d점 · 길이 %2$d</string>
+    <string name="stats_recent_days">최근 7일 점수</string>
+    <string name="stats_legend_completed">오늘의 도전 완료한 날</string>
+    <string name="stats_today">오늘</string>
+    <!-- DayOfWeek 순서(월요일부터) -->
+    <string-array name="day_of_week_short">
+        <item>월</item>
+        <item>화</item>
+        <item>수</item>
+        <item>목</item>
+        <item>금</item>
+        <item>토</item>
+        <item>일</item>
+    </string-array>
+
     <string name="result_max_pattern_length">최대 기억 길이</string>
     <string name="result_score">최종 점수</string>
     <string name="result_rounds_cleared">성공 라운드</string>

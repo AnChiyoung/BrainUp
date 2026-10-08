@@ -11,32 +11,54 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.core.designsystem.titleRes
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
+import com.dev.goodluckcy.brainup.domain.model.RecordOutcome
 
-// TODO(Day 6~7): 개인 최고 기록 여부 표시
 // TODO(Day 8~10): 결과 확인 후 화면 전환 시 전면 광고 조건 검사
 @Composable
 fun ResultScreen(
-    result: GameResult,
+    onRetry: (GameType) -> Unit,
+    onNextGame: (GameType) -> Unit,
+    onHome: () -> Unit,
+    viewModel: ResultViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    ResultContent(
+        uiState = uiState,
+        onRetry = { onRetry(uiState.result.gameType) },
+        onNextGame = onNextGame,
+        onHome = onHome,
+    )
+}
+
+@Composable
+private fun ResultContent(
+    uiState: ResultUiState,
     onRetry: () -> Unit,
     onNextGame: (GameType) -> Unit,
     onHome: () -> Unit,
 ) {
+    val result = uiState.result
     val nextGame = GameType.entries[(result.gameType.ordinal + 1) % GameType.entries.size]
     Column(
         modifier = Modifier
@@ -66,6 +88,7 @@ fun ResultScreen(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
                 )
+                uiState.outcome?.let { PersonalBestText(it) }
             }
             Card(modifier = Modifier.fillMaxWidth()) {
                 Row(
@@ -89,6 +112,7 @@ fun ResultScreen(
                     StatItem(stringResource(R.string.result_duration), formatDuration(result.durationMs))
                 }
             }
+            uiState.outcome?.let { DailyChallengeCard(it) }
         }
         Button(
             onClick = onRetry,
@@ -133,6 +157,57 @@ private fun StatItem(label: String, value: String) {
     }
 }
 
+@Composable
+private fun PersonalBestText(outcome: RecordOutcome) {
+    val previousBest = outcome.previousBestScore
+    val (text, color) = when {
+        outcome.isPersonalBest && previousBest == null ->
+            stringResource(R.string.result_first_record) to MaterialTheme.colorScheme.secondary
+        outcome.isPersonalBest ->
+            stringResource(R.string.result_new_best, previousBest ?: 0) to MaterialTheme.colorScheme.secondary
+        else ->
+            stringResource(R.string.result_best_score, previousBest ?: 0) to MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = if (outcome.isPersonalBest) FontWeight.Bold else FontWeight.Normal,
+        color = color,
+    )
+}
+
+@Composable
+private fun DailyChallengeCard(outcome: RecordOutcome) {
+    val completed = outcome.todayCompletedCount == GameType.entries.size
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (completed) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+        ),
+    ) {
+        Text(
+            text = when {
+                outcome.dailyCompletedNow -> stringResource(R.string.result_daily_completed_now)
+                completed -> stringResource(R.string.home_daily_done)
+                else -> stringResource(
+                    R.string.result_daily_progress,
+                    outcome.todayCompletedCount,
+                    GameType.entries.size,
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            style = MaterialTheme.typography.titleSmall,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
 private fun formatDuration(durationMs: Long): String {
     val totalSeconds = durationMs / 1000
     return "%d:%02d".format(totalSeconds / 60, totalSeconds % 60)
@@ -140,15 +215,23 @@ private fun formatDuration(durationMs: Long): String {
 
 @Preview(showBackground = true)
 @Composable
-private fun ResultScreenPreview() {
+private fun ResultContentPreview() {
     BrainUpTheme {
-        ResultScreen(
-            result = GameResult(
-                gameType = GameType.NUMBER_MEMORY,
-                score = 150,
-                level = 3,
-                roundsCleared = 5,
-                durationMs = 74_000,
+        ResultContent(
+            uiState = ResultUiState(
+                result = GameResult(
+                    gameType = GameType.NUMBER_MEMORY,
+                    score = 150,
+                    level = 3,
+                    roundsCleared = 5,
+                    durationMs = 74_000,
+                ),
+                outcome = RecordOutcome(
+                    isPersonalBest = true,
+                    previousBestScore = 120,
+                    dailyCompletedNow = false,
+                    todayCompletedCount = 2,
+                ),
             ),
             onRetry = {},
             onNextGame = {},
