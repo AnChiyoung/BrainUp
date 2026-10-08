@@ -79,7 +79,12 @@ fun ResultScreen(
                         StatItem(stringResource(R.string.reaction_best), stringResource(R.string.unit_ms, result.bestReactionMs))
                     } else {
                         StatItem(stringResource(R.string.result_rounds_cleared), result.roundsCleared.toString())
-                        StatItem(stringResource(R.string.result_level), result.level.toString())
+                        val levelLabel = if (result.gameType == GameType.PATTERN) {
+                            R.string.result_max_pattern_length
+                        } else {
+                            R.string.result_level
+                        }
+                        StatItem(stringResource(levelLabel), result.level.toString())
                     }
                     StatItem(stringResource(R.string.result_duration), formatDuration(result.durationMs))
                 }

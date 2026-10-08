@@ -8,9 +8,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
-import com.dev.goodluckcy.brainup.feature.game.GamePlaceholderScreen
 import com.dev.goodluckcy.brainup.feature.home.HomeScreen
 import com.dev.goodluckcy.brainup.feature.numbermemory.NumberMemoryScreen
+import com.dev.goodluckcy.brainup.feature.pattern.PatternMemoryScreen
 import com.dev.goodluckcy.brainup.feature.reaction.ReactionScreen
 import com.dev.goodluckcy.brainup.feature.result.ResultScreen
 import com.dev.goodluckcy.brainup.feature.settings.SettingsScreen
@@ -45,7 +45,7 @@ fun BrainUpNavHost(
             when (gameType) {
                 GameType.NUMBER_MEMORY -> NumberMemoryScreen(onBack = onBack, onFinish = onFinish)
                 GameType.REACTION -> ReactionScreen(onBack = onBack, onFinish = onFinish)
-                GameType.PATTERN -> GamePlaceholderScreen(gameType = gameType, onBack = onBack)
+                GameType.PATTERN -> PatternMemoryScreen(onBack = onBack, onFinish = onFinish)
             }
         }
         composable<ResultRoute> { entry ->

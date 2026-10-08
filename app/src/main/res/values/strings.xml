@@ -60,6 +60,15 @@
     <string name="reaction_false_starts">너무 빨리 누른 횟수: %1$d</string>
     <string name="reaction_disclaimer">기기의 화면·터치 지연이 포함된 참고용 기록입니다.</string>
 
+    <string name="pattern_rules">타일이 빛나는 순서를 기억한 뒤\n같은 순서로 터치하세요.\n라운드마다 하나씩 길어집니다.</string>
+    <string name="pattern_memorizing">빛나는 순서를 기억하세요</string>
+    <string name="pattern_answering">같은 순서로 터치하세요 (%1$d/%2$d)</string>
+    <string name="pattern_success">정답! 하나 더 늘어납니다</string>
+    <string name="pattern_finished">틀렸어요 — 테두리 타일이 정답입니다</string>
+    <string name="pattern_length">길이</string>
+    <string name="pattern_tile">타일 %1$d</string>
+
+    <string name="result_max_pattern_length">최대 기억 길이</string>
     <string name="result_score">최종 점수</string>
     <string name="result_rounds_cleared">성공 라운드</string>
     <string name="result_level">최고 레벨</string>
