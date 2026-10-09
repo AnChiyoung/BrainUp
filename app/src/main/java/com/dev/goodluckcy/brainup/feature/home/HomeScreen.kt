@@ -237,12 +237,13 @@ private fun HomeHud(uiState: HomeUiState) {
 
 /** 지도 위 노드 위치(지도 영역 대비 비율). 아래에서 위로 게임 순서대로 지그재그, 맨 위가 보물상자 */
 private val NodePositions = mapOf(
-    GameType.NUMBER_MEMORY to Offset(0.28f, 0.87f),
-    GameType.REACTION to Offset(0.72f, 0.67f),
-    GameType.PATTERN to Offset(0.28f, 0.47f),
-    GameType.COLOR_RUN to Offset(0.72f, 0.28f),
+    // 맨 아래 노드 이름표가 플레이 버튼에 가리지 않도록 아래쪽에 여유를 둔다.
+    GameType.NUMBER_MEMORY to Offset(0.28f, 0.79f),
+    GameType.REACTION to Offset(0.72f, 0.60f),
+    GameType.PATTERN to Offset(0.28f, 0.42f),
+    GameType.COLOR_RUN to Offset(0.72f, 0.245f),
 )
-private val ChestPosition = Offset(0.30f, 0.08f)
+private val ChestPosition = Offset(0.30f, 0.075f)
 
 @Composable
 private fun AdventureMap(
@@ -274,7 +275,9 @@ private fun AdventureMap(
                 .offset(
                     x = mapWidth * ChestPosition.x - 70.dp,
                     // "열기!" 말풍선이 붙어도 상자 자리는 그대로 둔다.
-                    y = mapHeight * ChestPosition.y - nodeSize * 0.35f - if (chestReady) ChestBubbleSpace else 0.dp,
+                    // 낮은 화면에서도 위쪽 HUD를 침범하지 않게 지도 위쪽 끝에서 멈춘다.
+                    y = (mapHeight * ChestPosition.y - nodeSize * 0.35f - if (chestReady) ChestBubbleSpace else 0.dp)
+                        .coerceAtLeast(0.dp),
                 )
                 .width(140.dp)
                 .popInLayer(chestAppear)
