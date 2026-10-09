@@ -19,6 +19,7 @@ import com.dev.goodluckcy.brainup.core.designsystem.theme.Night
 import com.dev.goodluckcy.brainup.core.designsystem.theme.NightLight
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Orange
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Pink
+import com.dev.goodluckcy.brainup.core.designsystem.theme.PinkDark
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Sky
 import com.dev.goodluckcy.brainup.core.designsystem.theme.SkyGlow
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Sun
@@ -85,7 +86,7 @@ val ShopItem.tileSkin: TileSkinStyle
             shape = CircleShape,
             round = true,
             lit = Pink,
-            litBottom = Color(0xFFD63A68),
+            litBottom = PinkDark,
             litIcon = GameIcons.Heart,
             litIconTint = Color.White,
             litIconFill = Color.White,

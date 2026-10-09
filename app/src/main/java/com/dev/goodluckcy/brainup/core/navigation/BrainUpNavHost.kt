@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
+import com.dev.goodluckcy.brainup.feature.colorrun.ColorRunScreen
 import com.dev.goodluckcy.brainup.feature.home.HomeScreen
 import com.dev.goodluckcy.brainup.feature.numbermemory.NumberMemoryScreen
 import com.dev.goodluckcy.brainup.feature.pattern.PatternMemoryScreen
@@ -56,6 +57,7 @@ fun BrainUpNavHost(
                 GameType.NUMBER_MEMORY -> NumberMemoryScreen(onBack = onBack, onFinish = onFinish)
                 GameType.REACTION -> ReactionScreen(onBack = onBack, onFinish = onFinish)
                 GameType.PATTERN -> PatternMemoryScreen(onBack = onBack, onFinish = onFinish)
+                GameType.COLOR_RUN -> ColorRunScreen(onBack = onBack, onFinish = onFinish)
             }
         }
         composable<ResultRoute> {

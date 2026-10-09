@@ -224,12 +224,19 @@ private fun StatChips(result: GameResult) {
         if (result.medianReactionMs != null && result.bestReactionMs != null) {
             add(stringResource(R.string.reaction_median) to stringResource(R.string.unit_ms, result.medianReactionMs))
             add(stringResource(R.string.reaction_best) to stringResource(R.string.unit_ms, result.bestReactionMs))
+        } else if (result.gameType == GameType.COLOR_RUN) {
+            add(stringResource(R.string.result_clean_gates) to result.roundsCleared.toString())
+            add(stringResource(R.string.result_max_combo) to result.level.toString())
         } else {
             add(stringResource(R.string.result_rounds_cleared) to result.roundsCleared.toString())
             val levelLabel = if (result.gameType == GameType.PATTERN) R.string.result_max_pattern_length else R.string.result_level
             add(stringResource(levelLabel) to result.level.toString())
         }
-        add(stringResource(R.string.result_duration) to formatDuration(result.durationMs))
+        if (result.gameType == GameType.COLOR_RUN) {
+            add(stringResource(R.string.result_finish_time) to formatRunTime(result.durationMs))
+        } else {
+            add(stringResource(R.string.result_duration) to formatDuration(result.durationMs))
+        }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         stats.forEach { (label, value) ->
@@ -361,6 +368,11 @@ private val CoinSource.labelRes: Int
         CoinSource.STREAK_BONUS -> R.string.coin_source_streak_bonus
         else -> R.string.coin_source_game_complete
     }
+
+private fun formatRunTime(durationMs: Long): String {
+    val tenths = durationMs / 100
+    return "%d.%d초".format(tenths / 10, tenths % 10)
+}
 
 private fun formatDuration(durationMs: Long): String {
     val totalSeconds = durationMs / 1000

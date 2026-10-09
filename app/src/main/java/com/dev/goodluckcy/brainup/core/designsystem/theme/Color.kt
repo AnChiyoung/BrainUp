@@ -43,6 +43,7 @@ val SkyGlow = Color(0xFF74C0FC)
 val Danger = Color(0xFFE8434A)
 /** 강조 스티커 */
 val Pink = Color(0xFFFF5C8A)
+val PinkDark = Color(0xFFD63A68)
 /** 마스코트 */
 val Brainy = Color(0xFFFF8FB1)
 

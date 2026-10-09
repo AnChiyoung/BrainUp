@@ -12,9 +12,11 @@ import androidx.annotation.Keep
 enum class GameType(val bit: Int, val analyticsName: String) {
     NUMBER_MEMORY(1 shl 0, "number_memory"),
     REACTION(1 shl 1, "reaction"),
-    PATTERN(1 shl 2, "pattern");
+    PATTERN(1 shl 2, "pattern"),
+    COLOR_RUN(1 shl 3, "color_run");
 
     companion object {
-        const val ALL_COMPLETED_MASK = 0b111
+        /** 오늘의 모험 완료(모든 게임 1판 이상) */
+        val ALL_COMPLETED_MASK: Int = entries.fold(0) { mask, type -> mask or type.bit }
     }
 }

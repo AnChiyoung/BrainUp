@@ -235,13 +235,14 @@ private fun HomeHud(uiState: HomeUiState) {
     }
 }
 
-/** 지도 위 노드 위치(지도 영역 대비 비율). 아래에서 위로 숫자 → 반응 → 패턴 → 보물상자 */
+/** 지도 위 노드 위치(지도 영역 대비 비율). 아래에서 위로 게임 순서대로 지그재그, 맨 위가 보물상자 */
 private val NodePositions = mapOf(
-    GameType.NUMBER_MEMORY to Offset(0.28f, 0.83f),
-    GameType.REACTION to Offset(0.70f, 0.58f),
-    GameType.PATTERN to Offset(0.30f, 0.33f),
+    GameType.NUMBER_MEMORY to Offset(0.28f, 0.87f),
+    GameType.REACTION to Offset(0.72f, 0.67f),
+    GameType.PATTERN to Offset(0.28f, 0.47f),
+    GameType.COLOR_RUN to Offset(0.72f, 0.28f),
 )
-private val ChestPosition = Offset(0.70f, 0.10f)
+private val ChestPosition = Offset(0.30f, 0.08f)
 
 @Composable
 private fun AdventureMap(
@@ -255,7 +256,7 @@ private fun AdventureMap(
         val mapWidth = maxWidth
         val mapHeight = maxHeight
         // 작은 화면에서도 노드가 겹치지 않도록 지도 높이에 맞춰 크기를 줄인다.
-        val nodeSize = minOf(92.dp, mapHeight * 0.22f)
+        val nodeSize = minOf(84.dp, mapHeight * 0.17f)
 
         // 진입 연출: 길이 아래에서 위로 그려지고, 스테이지가 차례로 통통 튀어나온다.
         val pathProgress = remember { Animatable(0f) }
@@ -349,15 +350,12 @@ private val BubbleSpace = 36.dp
 private fun MapPath(progress: Float, modifier: Modifier) {
     Canvas(modifier = modifier) {
         fun at(p: Offset) = Offset(size.width * p.x, size.height * p.y)
-        val number = at(NodePositions.getValue(GameType.NUMBER_MEMORY))
-        val reaction = at(NodePositions.getValue(GameType.REACTION))
-        val pattern = at(NodePositions.getValue(GameType.PATTERN))
-        val chest = at(ChestPosition)
+        val stops = GameType.entries.map { at(NodePositions.getValue(it)) } + at(ChestPosition)
         val path = Path().apply {
-            moveTo(number.x, number.y)
-            cubicTo(number.x, number.y - 90f, reaction.x, reaction.y + 120f, reaction.x, reaction.y)
-            cubicTo(reaction.x, reaction.y - 120f, pattern.x, pattern.y + 120f, pattern.x, pattern.y)
-            cubicTo(pattern.x, pattern.y - 120f, chest.x, chest.y + 120f, chest.x, chest.y)
+            moveTo(stops.first().x, stops.first().y)
+            stops.zipWithNext { from, to ->
+                cubicTo(from.x, from.y - 100f, to.x, to.y + 100f, to.x, to.y)
+            }
         }.let { full ->
             // 진행률만큼만 잘라 그린다.
             val measure = PathMeasure().apply { setPath(full, false) }
