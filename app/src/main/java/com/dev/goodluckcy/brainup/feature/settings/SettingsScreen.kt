@@ -132,7 +132,7 @@ private fun SettingsContentPreview() {
         SettingsContent(
             isPrivacyOptionsRequired = true,
             onPrivacyOptionsClick = {},
-            versionName = "1.0",
+            versionName = "1.0.0",
         )
     }
 }
