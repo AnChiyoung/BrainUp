@@ -1,11 +1,11 @@
-# BrainUp 개인정보처리방침 (초안)
+# 브레인업! 개인정보처리방침
 
-> 게시 전 [ ] 표시 항목을 채우고, 웹에 공개한 URL을 Play Console과 앱 설정 화면에 연결한다.
+> 게시 URL: https://anchiyoung.github.io/brainup-privacy/ (원본: AnChiyoung/brainup-privacy 레포의 index.html). 수정 시 두 곳을 함께 고친다.
 > 법률 자문이 아니므로 필요하면 전문가 검토를 받는다.
 
-시행일: [YYYY-MM-DD]
+시행일: 2026-10-09
 
-[개발자 이름](이하 "개발자")은 브레인업!(BrainUp, 이하 "앱") 이용자의 개인정보를 소중히 다루며, 「개인정보 보호법」 등 관련 법령을 준수합니다.
+AhnChiyoung(이하 "개발자")은 브레인업!(BrainUp, 이하 "앱") 이용자의 개인정보를 소중히 다루며, 「개인정보 보호법」 등 관련 법령을 준수합니다.
 
 ## 1. 수집하는 정보
 
@@ -51,8 +51,8 @@
 
 ## 7. 문의처
 
-- 개발자: [이름]
-- 이메일: [문의용 이메일]
+- 개발자: AhnChiyoung
+- 이메일: dev.goodluckcy@gmail.com
 
 ## 8. 변경 안내
 
