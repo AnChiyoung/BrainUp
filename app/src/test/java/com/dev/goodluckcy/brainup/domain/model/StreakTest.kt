@@ -43,4 +43,19 @@ class StreakTest {
     fun `future dates are ignored`() {
         assertEquals(1, Streak.current(listOf(today, today.plusDays(1)), today))
     }
+
+    @Test
+    fun `shielded day keeps the chain but is not counted`() {
+        assertEquals(3, Streak.current(daysAgo(0, 2, 3), today, shieldedDates = daysAgo(1)))
+    }
+
+    @Test
+    fun `shielded yesterday keeps streak alive before today is played`() {
+        assertEquals(2, Streak.current(daysAgo(2, 3), today, shieldedDates = daysAgo(1)))
+    }
+
+    @Test
+    fun `shields alone do not make a streak`() {
+        assertEquals(0, Streak.current(emptyList(), today, shieldedDates = daysAgo(1, 2)))
+    }
 }

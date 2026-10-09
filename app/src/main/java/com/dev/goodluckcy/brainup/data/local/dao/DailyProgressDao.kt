@@ -22,6 +22,10 @@ interface DailyProgressDao {
     @Query("SELECT * FROM daily_progress WHERE date >= :fromDate AND date <= :toDate ORDER BY date")
     fun observeRange(fromDate: String, toDate: String): Flow<List<DailyProgressEntity>>
 
-    @Query("SELECT date FROM daily_progress WHERE completed = 1 ORDER BY date DESC")
-    fun observeCompletedDates(): Flow<List<String>>
+    /** 연속 기록 계산용: 완료했거나 방패로 지킨 날 */
+    @Query("SELECT * FROM daily_progress WHERE completed = 1 OR shielded = 1 ORDER BY date DESC")
+    fun observeStreakDays(): Flow<List<DailyProgressEntity>>
+
+    @Query("SELECT * FROM daily_progress WHERE completed = 1 OR shielded = 1 ORDER BY date DESC")
+    suspend fun streakDays(): List<DailyProgressEntity>
 }

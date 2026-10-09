@@ -7,6 +7,8 @@ data class DailyProgress(
     val completedGames: Set<GameType> = emptySet(),
     /** 그날 게임별 최고 점수의 합 */
     val totalScore: Int = 0,
+    /** 불꽃 방패로 연속 기록을 지킨 날 */
+    val shielded: Boolean = false,
 ) {
     val isCompleted: Boolean get() = completedGames.size == GameType.entries.size
 

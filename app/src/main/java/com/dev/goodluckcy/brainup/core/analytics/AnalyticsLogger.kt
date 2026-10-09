@@ -26,6 +26,17 @@ data class AnalyticsEvent(
 
         fun rewardGranted(rewardType: RewardType) =
             AnalyticsEvent("reward_granted", mapOf("reward_type" to rewardType.analyticsName))
+
+        fun coinEarned(source: String, amount: Int) =
+            AnalyticsEvent("coin_earned", mapOf("source" to source, "amount" to amount))
+
+        fun coinSpent(itemId: String, amount: Int) =
+            AnalyticsEvent("coin_spent", mapOf("item_id" to itemId, "amount" to amount))
+
+        fun shopView() = AnalyticsEvent("shop_view")
+
+        fun streakShieldUsed(streakDays: Int) =
+            AnalyticsEvent("streak_shield_used", mapOf("streak_days" to streakDays))
     }
 }
 
@@ -38,4 +49,7 @@ enum class AdFormat(val analyticsName: String) {
 enum class RewardType(val analyticsName: String) {
     /** 오답 후 같은 라운드 한 번 더 */
     CONTINUE("continue"),
+
+    /** 보물상자 코인 2배 */
+    CHEST_DOUBLE("chest_double"),
 }

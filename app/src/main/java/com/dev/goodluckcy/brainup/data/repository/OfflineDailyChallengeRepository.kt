@@ -26,8 +26,12 @@ class OfflineDailyChallengeRepository @Inject constructor(
         }
 
     override fun observeStreak(): Flow<Int> =
-        combine(dateProvider.observeToday(), dailyProgressDao.observeCompletedDates()) { today, dates ->
-            Streak.current(dates.map(LocalDate::parse), today)
+        combine(dateProvider.observeToday(), dailyProgressDao.observeStreakDays()) { today, days ->
+            Streak.current(
+                completedDates = days.filter { it.completed }.map { LocalDate.parse(it.date) },
+                today = today,
+                shieldedDates = days.filter { it.shielded }.map { LocalDate.parse(it.date) },
+            )
         }
 
     override fun observeRecentDays(days: Int): Flow<List<DailyProgress>> {
@@ -48,5 +52,6 @@ class OfflineDailyChallengeRepository @Inject constructor(
         date = LocalDate.parse(date),
         completedGames = DailyProgress.completedGamesOf(completedMask),
         totalScore = totalScore,
+        shielded = shielded,
     )
 }

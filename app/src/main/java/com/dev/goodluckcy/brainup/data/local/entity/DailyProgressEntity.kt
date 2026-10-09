@@ -1,5 +1,6 @@
 package com.dev.goodluckcy.brainup.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -12,4 +13,6 @@ data class DailyProgressEntity(
     /** 그날 게임별 최고 점수의 합 */
     val totalScore: Int,
     val completed: Boolean,
+    /** 불꽃 방패로 연속 기록을 지킨 날 (DB v2) */
+    @ColumnInfo(defaultValue = "0") val shielded: Boolean = false,
 )
