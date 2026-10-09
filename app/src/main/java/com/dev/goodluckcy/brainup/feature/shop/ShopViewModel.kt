@@ -21,6 +21,8 @@ data class ShopUiState(
     val inventory: Inventory = Inventory(),
     /** 구매 확인 중인 아이템 */
     val pendingPurchase: ShopItem? = null,
+    /** 장착 확인 중인 아이템 */
+    val pendingEquip: ShopItem? = null,
 ) {
     fun canAfford(item: ShopItem): Boolean = coins >= item.price
     fun isMaxed(item: ShopItem): Boolean = inventory.quantityOf(item) >= item.maxQuantity
@@ -33,14 +35,16 @@ class ShopViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val pendingPurchase = MutableStateFlow<ShopItem?>(null)
+    private val pendingEquip = MutableStateFlow<ShopItem?>(null)
     private var purchasing = false
 
     val uiState: StateFlow<ShopUiState> = combine(
         coinRepository.observeBalance(),
         coinRepository.observeInventory(),
         pendingPurchase,
-    ) { coins, inventory, pending ->
-        ShopUiState(coins = coins, inventory = inventory, pendingPurchase = pending)
+        pendingEquip,
+    ) { coins, inventory, purchase, equip ->
+        ShopUiState(coins = coins, inventory = inventory, pendingPurchase = purchase, pendingEquip = equip)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -51,11 +55,14 @@ class ShopViewModel @Inject constructor(
         analytics.log(AnalyticsEvent.shopView())
     }
 
-    /** 가진 꾸미기 아이템은 바로 장착하고, 아니면 구매 확인을 띄운다. */
+    /** 가진 꾸미기 아이템은 장착 확인을, 아니면 구매 확인을 띄운다. */
     fun onItemClick(item: ShopItem) {
         val state = uiState.value
         when {
-            !item.isConsumable && state.inventory.owns(item) -> viewModelScope.launch { coinRepository.equip(item) }
+            !item.isConsumable && state.inventory.owns(item) -> {
+                val equipped = item.slot?.let { state.inventory.equippedIn(it) } == item
+                if (!equipped) pendingEquip.value = item
+            }
             state.isMaxed(item) || !state.canAfford(item) -> Unit
             else -> pendingPurchase.value = item
         }
@@ -77,5 +84,15 @@ class ShopViewModel @Inject constructor(
 
     fun cancelPurchase() {
         pendingPurchase.value = null
+    }
+
+    fun confirmEquip() {
+        val item = pendingEquip.value ?: return
+        pendingEquip.value = null
+        viewModelScope.launch { coinRepository.equip(item) }
+    }
+
+    fun cancelEquip() {
+        pendingEquip.value = null
     }
 }

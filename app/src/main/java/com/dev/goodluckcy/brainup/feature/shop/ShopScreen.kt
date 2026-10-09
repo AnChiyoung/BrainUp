@@ -83,6 +83,9 @@ fun ShopScreen(viewModel: ShopViewModel = hiltViewModel()) {
             onCancel = viewModel::cancelPurchase,
         )
     }
+    uiState.pendingEquip?.let { item ->
+        EquipDialog(item = item, onConfirm = viewModel::confirmEquip, onCancel = viewModel::cancelEquip)
+    }
 }
 
 @Composable
@@ -263,15 +266,7 @@ private fun ItemStatus(equipped: Boolean, owned: Boolean, canAfford: Boolean, pr
             GameIcon(icon = GameIcons.Check, size = 13.dp, tint = Ink, strokeWidth = 3.4f)
             Text(stringResource(R.string.shop_equipped), style = MaterialTheme.typography.labelMedium, color = Ink)
         }
-        // 가졌지만 끼지 않음: 누르면 바로 바뀐다는 걸 알 수 있게 버튼 모양으로
-        owned -> Text(
-            text = stringResource(R.string.shop_equip),
-            modifier = Modifier
-                .border(2.dp, Color.White, RoundedCornerShape(999.dp))
-                .padding(horizontal = 10.dp, vertical = 1.dp),
-            style = MaterialTheme.typography.labelMedium,
-            color = Color.White,
-        )
+        owned -> Text(stringResource(R.string.shop_owned), style = MaterialTheme.typography.labelMedium, color = Lavender)
         else -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             if (canAfford) {
                 CoinDot(size = 14.dp)
@@ -386,6 +381,25 @@ private fun PurchaseDialog(
         }
         DialogAction(onClick = onCancel, color = NightDeep, shadowColor = NightDeeper) {
             Text(stringResource(R.string.shop_buy_cancel), style = MaterialTheme.typography.titleLarge, color = Color.White)
+        }
+    }
+}
+
+@Composable
+private fun EquipDialog(item: ShopItem, onConfirm: () -> Unit, onCancel: () -> Unit) {
+    GameDialog(onDismissRequest = onCancel) {
+        ItemPreview(item = item, modifier = Modifier.size(96.dp))
+        Text(
+            text = stringResource(R.string.shop_equip_title, stringResource(item.nameRes)),
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+        )
+        DialogAction(onClick = onConfirm, color = Sun, shadowColor = Ink) {
+            Text(stringResource(R.string.shop_equip_confirm), style = MaterialTheme.typography.titleLarge, color = Ink)
+        }
+        DialogAction(onClick = onCancel, color = NightDeep, shadowColor = NightDeeper) {
+            Text(stringResource(R.string.shop_equip_cancel), style = MaterialTheme.typography.titleLarge, color = Color.White)
         }
     }
 }
