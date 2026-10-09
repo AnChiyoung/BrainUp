@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.designsystem.component.GameIconSpec
@@ -46,14 +47,18 @@ val ShopItem.nameRes: Int
 
 private val RainbowBrush = Brush.verticalGradient(listOf(Orange, Sun, Go, SkyGlow))
 
+/** 마스코트 브레니 몸 색(색 아이템). 무지개는 그라데이션이다. */
+val ShopItem.brainyBrush: Brush
+    get() = when (this) {
+        ShopItem.BRAINY_RAINBOW -> RainbowBrush
+        ShopItem.BRAINY_MINT -> SolidColor(Go)
+        ShopItem.BRAINY_SKY -> SolidColor(SkyGlow)
+        ShopItem.BRAINY_YELLOW -> SolidColor(Sun)
+        else -> SolidColor(Brainy)
+    }
+
 /** 마스코트 브레니 바탕(색 아이템) */
-fun Modifier.brainyBackground(item: ShopItem, shape: Shape): Modifier = when (item) {
-    ShopItem.BRAINY_RAINBOW -> background(RainbowBrush, shape)
-    ShopItem.BRAINY_MINT -> background(Go, shape)
-    ShopItem.BRAINY_SKY -> background(SkyGlow, shape)
-    ShopItem.BRAINY_YELLOW -> background(Sun, shape)
-    else -> background(Brainy, shape)
-}
+fun Modifier.brainyBackground(item: ShopItem, shape: Shape): Modifier = background(item.brainyBrush, shape)
 
 /** 지도 배경 테마 */
 data class SkyPalette(val ground: Color, val planet: Color, val accentPlanet: Color? = null)

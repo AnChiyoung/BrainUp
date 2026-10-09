@@ -85,7 +85,7 @@ class ColorRunEngineTest {
 
     @Test
     fun `faster finish scores higher`() {
-        assertEquals(200, engine.score(30_000))
+        assertEquals(200, engine.score(20_000))
         assertTrue(engine.score(25_000) > engine.score(40_000))
     }
 

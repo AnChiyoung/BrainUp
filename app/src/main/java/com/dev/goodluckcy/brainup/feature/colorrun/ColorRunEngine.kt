@@ -82,8 +82,8 @@ class ColorRunEngine @Inject constructor(
         const val GATE_COUNT = 20
         const val GATE_SPACING = 10f
         const val FINISH_DISTANCE = GATE_SPACING * (GATE_COUNT + 1)
-        const val BASE_SPEED = 4f
-        const val SPEED_PER_COMBO = 0.6f
+        const val BASE_SPEED = 8f
+        const val SPEED_PER_COMBO = 1.2f
         const val MAX_COMBO = 5
         const val STUN_MS = 700L
         const val EASY_GATES = 6
@@ -91,8 +91,8 @@ class ColorRunEngine @Inject constructor(
         const val COLORS = 4
         const val SHUFFLE_EVERY = 5
 
-        /** 30초에 결승선을 통과하면 200점 */
-        const val SCORE_FACTOR = 6_000_000L
+        /** 20초에 결승선을 통과하면 200점 */
+        const val SCORE_FACTOR = 4_000_000L
 
         fun colorCountFor(gateIndex: Int): Int = if (gateIndex < EASY_GATES) EASY_COLORS else COLORS
 
