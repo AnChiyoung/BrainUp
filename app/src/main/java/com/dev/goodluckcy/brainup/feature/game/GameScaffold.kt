@@ -1,5 +1,6 @@
 package com.dev.goodluckcy.brainup.feature.game
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -23,7 +24,10 @@ import com.dev.goodluckcy.brainup.core.designsystem.component.GameIconButton
 import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcons
 import com.dev.goodluckcy.brainup.core.designsystem.component.nightSky
 
-/** 게임 화면 공통 틀: 밤하늘 배경, 시스템 바 여백, 상단 바(뒤로가기 + 제목 + 오른쪽 칩) */
+/**
+ * 게임 화면 공통 틀: 밤하늘 배경, 시스템 바 여백, 상단 바(뒤로가기 + 제목 + 오른쪽 칩).
+ * 시스템 뒤로가기는 막으며, 화면을 나가는 방법은 상단 뒤로가기 버튼([onBack])뿐이다.
+ */
 @Composable
 fun GameScaffold(
     title: String,
@@ -33,6 +37,8 @@ fun GameScaffold(
     trailing: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    // 게임 중 실수로 나가지 않도록 시스템 뒤로가기(제스처·키)는 막고 상단 버튼으로만 나간다.
+    BackHandler(enabled = true) {}
     Column(
         modifier = modifier
             .fillMaxSize()
