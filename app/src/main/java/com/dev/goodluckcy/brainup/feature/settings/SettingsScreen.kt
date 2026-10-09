@@ -145,8 +145,8 @@ private fun SettingsContent(
     }
 }
 
-/** GitHub Pages에 게시한 개인정보처리방침 (원본: AnChiyoung/brainup-privacy) */
-private const val PRIVACY_POLICY_URL = "https://anchiyoung.github.io/brainup-privacy/"
+/** GitHub Pages에 게시한 개인정보처리방침 (원본: AnChiyoung/BrainUp-privacy) */
+private const val PRIVACY_POLICY_URL = "https://anchiyoung.github.io/BrainUp-privacy/"
 
 @Composable
 private fun SectionHeader(text: String) {

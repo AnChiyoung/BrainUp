@@ -1,6 +1,6 @@
 # 브레인업! 개인정보처리방침
 
-> 게시 URL: https://anchiyoung.github.io/brainup-privacy/ (원본: AnChiyoung/brainup-privacy 레포의 index.html). 수정 시 두 곳을 함께 고친다.
+> 게시 URL: https://anchiyoung.github.io/BrainUp-privacy/ (원본: AnChiyoung/BrainUp-privacy 레포의 index.html). 수정 시 두 곳을 함께 고친다.
 > 법률 자문이 아니므로 필요하면 전문가 검토를 받는다.
 
 시행일: 2026-10-09
