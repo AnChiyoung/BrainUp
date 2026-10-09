@@ -1,17 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- BrainUp: 위쪽 화살표(성장)와 반짝임. 적응형 아이콘 안전 영역(지름 66dp) 안에 배치 -->
+<!-- 마스코트 브레니 얼굴과 반짝임. 적응형 아이콘 안전 영역(지름 66dp) 안에 배치 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- 아래로 떨어지는 그림자 -->
+    <path
+        android:fillColor="#FF1E1B3A"
+        android:pathData="M45,35.5H63A13,13 0,0 1,76 48.5V66.5A13,13 0,0 1,63 79.5H45A13,13 0,0 1,32 66.5V48.5A13,13 0,0 1,45 35.5Z" />
+    <!-- 몸 -->
+    <path
+        android:fillColor="#FFFF8FB1"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M45,32H63A13,13 0,0 1,76 45V63A13,13 0,0 1,63 76H45A13,13 0,0 1,32 63V45A13,13 0,0 1,45 32Z" />
+    <!-- 눈 -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M52.6,31.4a2,2 0,0 1,2.8 0l19.8,20.4a1.6,1.6 0,0 1,-1.2 2.7H63v20.5a2.5,2.5 0,0 1,-2.5 2.5h-13a2.5,2.5 0,0 1,-2.5 -2.5V54.5H35a1.6,1.6 0,0 1,-1.2 -2.7z" />
+        android:pathData="M46,51m-5,0a5,5 0,1 0,10 0a5,5 0,1 0,-10 0M62,51m-5,0a5,5 0,1 0,10 0a5,5 0,1 0,-10 0" />
     <path
-        android:fillColor="@color/brand_amber"
-        android:pathData="M71,34m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+        android:fillColor="#FF1E1B3A"
+        android:pathData="M47,52.5m-2.8,0a2.8,2.8 0,1 0,5.6 0a2.8,2.8 0,1 0,-5.6 0M63,52.5m-2.8,0a2.8,2.8 0,1 0,5.6 0a2.8,2.8 0,1 0,-5.6 0" />
+    <!-- 웃는 입 -->
     <path
-        android:fillColor="@color/brand_amber"
-        android:pathData="M33,35m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+        android:strokeColor="#FF1E1B3A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M47.5,60.5Q54,66.5 60.5,60.5" />
+    <!-- 반짝임 -->
+    <path
+        android:fillColor="#FFFFD43B"
+        android:strokeColor="#FF1E1B3A"
+        android:strokeWidth="1.4"
+        android:strokeLineJoin="round"
+        android:pathData="M72,29l1.8,4.6 4.6,1.8 -4.6,1.8 -1.8,4.6 -1.8,-4.6 -4.6,-1.8 4.6,-1.8z" />
 </vector>

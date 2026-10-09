@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 테마 아이콘(Android 13+)용 한 가지 색 브레니: 얼굴은 비워 둔다 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"
+        android:pathData="M45,32H63A13,13 0,0 1,76 45V63A13,13 0,0 1,63 76H45A13,13 0,0 1,32 63V45A13,13 0,0 1,45 32ZM46,51m-5,0a5,5 0,1 0,10 0a5,5 0,1 0,-10 0ZM62,51m-5,0a5,5 0,1 0,10 0a5,5 0,1 0,-10 0Z" />
+</vector>
