@@ -73,6 +73,7 @@ import com.dev.goodluckcy.brainup.core.designsystem.component.OutlineWidth
 import com.dev.goodluckcy.brainup.core.designsystem.component.TreasureChest
 import com.dev.goodluckcy.brainup.core.designsystem.component.chunky
 import com.dev.goodluckcy.brainup.core.designsystem.component.nightSky
+import com.dev.goodluckcy.brainup.core.designsystem.component.tabBarPadding
 import com.dev.goodluckcy.brainup.core.designsystem.icon
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Brainy
@@ -108,7 +109,8 @@ private fun HomeContent(
         modifier = Modifier
             .fillMaxSize()
             .nightSky(variant = 0)
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .tabBarPadding(),
     ) {
         HomeHud(uiState)
         AdventureMap(

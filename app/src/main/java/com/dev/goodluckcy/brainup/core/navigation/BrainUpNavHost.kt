@@ -1,5 +1,8 @@
 package com.dev.goodluckcy.brainup.core.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -25,6 +28,11 @@ fun BrainUpNavHost(
         navController = navController,
         startDestination = HomeRoute,
         modifier = modifier,
+        // 기본 전환(0.7초 크로스페이드) 대신 짧은 페이드로 화면을 바꾼다.
+        enterTransition = { fadeIn(tween(SCREEN_FADE_MS)) },
+        exitTransition = { fadeOut(tween(SCREEN_FADE_MS)) },
+        popEnterTransition = { fadeIn(tween(SCREEN_FADE_MS)) },
+        popExitTransition = { fadeOut(tween(SCREEN_FADE_MS)) },
     ) {
         composable<HomeRoute> {
             HomeScreen(onGameClick = { gameType -> navController.navigate(GameRoute(gameType)) })
@@ -59,3 +67,5 @@ fun BrainUpNavHost(
         }
     }
 }
+
+private const val SCREEN_FADE_MS = 200

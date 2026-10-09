@@ -1,10 +1,16 @@
 package com.dev.goodluckcy.brainup.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,7 +18,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,26 +48,32 @@ fun BrainUpApp() {
     // 게임 플레이·결과 화면에서는 하단 탭을 숨긴다.
     val showBottomBar = TopLevelDestination.entries.any { currentDestination.isTopLevel(it) }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Night,
-        // 상단 인셋은 각 화면이 처리한다.
-        contentWindowInsets = WindowInsets(0),
-        bottomBar = {
-            if (showBottomBar) {
-                GameTabBar(
-                    isSelected = { currentDestination.isTopLevel(it) },
-                    onSelect = { navController.navigateToTopLevel(it) },
-                )
-            }
-        },
-    ) { innerPadding ->
+    // 탭 바는 화면 위에 얹는다. 탭 바가 나타나고 사라져도 화면 크기가 바뀌지 않아
+    // 전환 중에 이전 화면이 늘어나 보이지 않는다. 탭 화면은 tabBarPadding()으로 여백을 둔다.
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Night),
+    ) {
         BrainUpNavHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
         )
+        AnimatedVisibility(
+            visible = showBottomBar,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = slideInVertically(tween(TAB_BAR_ANIM_MS)) { it } + fadeIn(tween(TAB_BAR_ANIM_MS)),
+            exit = slideOutVertically(tween(TAB_BAR_ANIM_MS)) { it } + fadeOut(tween(TAB_BAR_ANIM_MS)),
+        ) {
+            GameTabBar(
+                isSelected = { currentDestination.isTopLevel(it) },
+                onSelect = { navController.navigateToTopLevel(it) },
+            )
+        }
     }
 }
+
+private const val TAB_BAR_ANIM_MS = 200
 
 /** 떠 있는 어두운 탭 바. 선택된 탭은 노란 알약으로 표시한다. */
 @Composable
@@ -73,7 +84,6 @@ private fun GameTabBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Night)
             .navigationBarsPadding()
             .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 12.dp)
             .background(Ink, RoundedCornerShape(22.dp))

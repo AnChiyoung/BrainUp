@@ -27,6 +27,7 @@ import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.ads.LocalAdServices
 import com.dev.goodluckcy.brainup.core.designsystem.component.GamePanel
 import com.dev.goodluckcy.brainup.core.designsystem.component.nightSky
+import com.dev.goodluckcy.brainup.core.designsystem.component.tabBarPadding
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Lavender
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Sun
@@ -58,6 +59,7 @@ private fun SettingsContent(
             .fillMaxSize()
             .nightSky(variant = 2)
             .statusBarsPadding()
+            .tabBarPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),

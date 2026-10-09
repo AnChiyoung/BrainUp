@@ -42,6 +42,7 @@ import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcons
 import com.dev.goodluckcy.brainup.core.designsystem.component.GamePanel
 import com.dev.goodluckcy.brainup.core.designsystem.component.chunky
 import com.dev.goodluckcy.brainup.core.designsystem.component.nightSky
+import com.dev.goodluckcy.brainup.core.designsystem.component.tabBarPadding
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
 import com.dev.goodluckcy.brainup.core.designsystem.theme.ChestLid
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Ink
@@ -70,7 +71,8 @@ private fun StatsContent(uiState: StatsUiState) {
         modifier = Modifier
             .fillMaxSize()
             .nightSky(variant = 1)
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .tabBarPadding(),
     ) {
         Text(
             text = stringResource(R.string.trophy_room_title),
