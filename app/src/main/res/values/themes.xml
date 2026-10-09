@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 앱 시작 직후 흰 화면이 번쩍이지 않도록 밤하늘 배경색을 창 배경으로 쓴다. -->
+    <style name="Theme.BrainUp" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/night</item>
+    </style>
+</resources>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>브레인업 그래픽 이미지</title>
+<style>
+  @font-face { font-family: Jua; src: url("../../../app/src/main/res/font/jua_regular.ttf"); }
+  :root {
+    --night: #3B2A9E; --night-deep: #22176B; --night-light: #4A37B8;
+    --ink: #1E1B3A; --sun: #FFD43B; --pink: #FF5C8A; --brainy: #FF8FB1;
+    --mint: #20C997; --sky: #4DABF7; --orange: #FF8A3D; --lavender: #C9C1FF;
+  }
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 1024px; height: 500px; overflow: hidden; background: var(--night); }
+  .canvas {
+    position: relative; width: 1024px; height: 500px; overflow: hidden;
+    background: radial-gradient(circle at 78% 30%, var(--night-light) 0 190px, transparent 191px),
+                radial-gradient(circle at 4% 102%, var(--night-light) 0 150px, transparent 151px),
+                var(--night);
+    font-family: Jua, sans-serif;
+  }
+  .star { position: absolute; border-radius: 50%; background: #fff; }
+  .copy { position: absolute; left: 64px; top: 0; bottom: 0; width: 430px; display: flex; flex-direction: column; justify-content: center; }
+  .brainy {
+    width: 96px; height: 96px; border-radius: 30px; background: var(--brainy);
+    border: 5px solid #fff; box-shadow: 0 8px 0 var(--ink); position: relative; margin-bottom: 26px;
+  }
+  .eye { position: absolute; top: 34px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+  .eye::after { content: ""; position: absolute; left: 6px; top: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); }
+  .eye.l { left: 22px; } .eye.r { left: 50px; }
+  .smile { position: absolute; left: 33px; top: 54px; width: 26px; height: 14px; border: 5px solid var(--ink); border-top: none; border-radius: 0 0 14px 14px; }
+  h1 { font-size: 84px; line-height: 1; color: #fff; font-weight: normal; letter-spacing: -1px; }
+  h1 span { color: var(--sun); }
+  .sub { margin-top: 18px; font-size: 30px; color: var(--lavender); line-height: 1.3; }
+  .chips { display: flex; gap: 10px; margin-top: 24px; }
+  .chip { width: 46px; height: 46px; border-radius: 50%; border: 4px solid var(--ink); box-shadow: 0 4px 0 var(--ink); }
+  .phones { position: absolute; right: 24px; top: 0; bottom: 0; width: 520px; }
+  .phone {
+    position: absolute; width: 196px; height: 392px; border-radius: 30px; padding: 8px;
+    background: var(--ink); box-shadow: 0 14px 0 rgba(20, 12, 70, .55);
+  }
+  .phone img { width: 100%; height: 100%; border-radius: 23px; display: block; object-fit: cover; object-position: top; }
+  .p1 { left: 0px; top: 92px; transform: rotate(-8deg); }
+  .p2 { left: 142px; top: 40px; transform: rotate(2deg); z-index: 2; width: 214px; height: 428px; }
+  .p3 { left: 292px; top: 96px; transform: rotate(9deg); }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="star" style="left:520px;top:40px;width:6px;height:6px"></div>
+  <div class="star" style="left:470px;top:430px;width:5px;height:5px;opacity:.7"></div>
+  <div class="star" style="left:40px;top:44px;width:6px;height:6px"></div>
+  <div class="star" style="left:990px;top:460px;width:5px;height:5px;opacity:.7"></div>
+
+  <div class="copy">
+    <div class="brainy"><div class="eye l"></div><div class="eye r"></div><div class="smile"></div></div>
+    <h1>브레인<span>업!</span></h1>
+    <p class="sub">4가지 두뇌 게임으로<br>매일 떠나는 모험</p>
+    <div class="chips">
+      <div class="chip" style="background:var(--orange)"></div>
+      <div class="chip" style="background:var(--mint)"></div>
+      <div class="chip" style="background:var(--sky)"></div>
+      <div class="chip" style="background:var(--pink)"></div>
+    </div>
+  </div>
+
+  <div class="phones">
+    <div class="phone p1"><img src="../screenshots/06_shop.png" alt=""></div>
+    <div class="phone p2"><img src="../screenshots/01_map.png" alt=""></div>
+    <div class="phone p3"><img src="../screenshots/02_color_run.png" alt=""></div>
+  </div>
+</div>
+</body>
+</html>

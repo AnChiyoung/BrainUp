@@ -1,0 +1,20 @@
+<resources>
+    <string name="color_run_rules">브레니가 결승선까지 달려요!\n앞에 오는 문과 같은 색 버튼을 누르면 문이 열려요.\n연속으로 맞히면 점점 빨라지고, 틀리면 넘어져요.</string>
+    <string name="color_run_gate_progress">문 %1$d / %2$d</string>
+    <string name="color_run_go">앞 문과 같은 색을 눌러!</string>
+    <string name="color_run_combo">%1$d콤보! 더 빨리!</string>
+    <string name="color_run_stunned">앗! 다른 색이에요</string>
+    <string name="color_run_blocked">문이 닫혀 있어요!</string>
+    <string name="color_run_last_stretch">결승선까지 달려!</string>
+    <string name="color_run_finished">결승선 통과!</string>
+    <string name="color_run_paused">잠깐 멈췄어요</string>
+    <string name="color_run_resume">계속 달리기</string>
+    <string name="color_run_color_pink">분홍</string>
+    <string name="color_run_color_yellow">노랑</string>
+    <string name="color_run_color_mint">초록</string>
+    <string name="color_run_color_sky">파랑</string>
+    <string name="color_run_button_desc">%1$s 문 열기</string>
+    <string name="result_clean_gates">깔끔 통과</string>
+    <string name="result_max_combo">최대 콤보</string>
+    <string name="result_finish_time">완주 시간</string>
+</resources>

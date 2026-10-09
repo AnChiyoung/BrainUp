@@ -1,0 +1,71 @@
+<resources>
+    <string name="nav_shop">상점</string>
+    <string name="coin_balance_desc">보유 코인 %1$s</string>
+    <string name="shield_count_desc">불꽃 방패 %1$d개</string>
+    <string name="coin_plus">+%1$s</string>
+
+    <string name="coin_result_title">획득 코인</string>
+    <string name="coin_result_games_today">오늘 %1$d/%2$d판</string>
+    <string name="coin_result_limit">오늘 게임 완료 코인은 다 받았어요</string>
+    <string name="coin_source_game_complete">게임 완료</string>
+    <string name="coin_source_personal_best">최고 기록 갱신</string>
+    <string name="coin_source_streak_bonus">연속 기록 보너스</string>
+    <string name="coin_result_total">합계</string>
+    <string name="coin_result_balance">보유 %1$s → %2$s</string>
+    <string name="result_chest_remaining_coin">보물상자까지 %1$d스테이지! +%2$d</string>
+
+    <string name="chest_open_bubble">열기!</string>
+    <string name="home_open_chest">보물상자 열기</string>
+    <string name="chest_title">보물상자 오픈!</string>
+    <string name="chest_desc">오늘의 모험 %1$d/%1$d 클리어 보상</string>
+    <string name="chest_double">2배 받기 · +%1$d</string>
+    <string name="chest_claim">그냥 받기 (+%1$d)</string>
+
+    <string name="welcome_title">환영 선물!</string>
+    <string name="welcome_desc">모험을 시작한 기념으로 코인을 드려요.\n상점에서 브레니를 꾸며 보세요.</string>
+    <string name="welcome_confirm">고마워요!</string>
+
+    <string name="shield_used_title">불꽃 방패가 연속 기록을 지켰어요!</string>
+    <string name="shield_used_desc">어제 쉬었지만 %1$d일 연속 기록이 그대로예요.</string>
+    <string name="shield_used_desc_multi">%1$d일 쉬었지만 %2$d일 연속 기록이 그대로예요.</string>
+    <string name="shield_streak_days">%1$d일</string>
+    <string name="shield_left">남은 방패 %1$d</string>
+    <string name="shield_start_today">오늘 모험 시작!</string>
+    <string name="shield_refill">상점에서 방패 채우기 · %1$d</string>
+
+    <string name="shop_title">상점</string>
+    <string name="shop_section_shield">불꽃 방패</string>
+    <string name="shop_shield_desc">하루 쉬어도 연속 기록을 지켜줘요</string>
+    <string name="shop_shield_owned">보유 %1$d / %2$d</string>
+    <string name="shop_section_brainy">브레니 꾸미기</string>
+    <string name="shop_section_tile">패턴 타일 스킨</string>
+    <string name="shop_section_theme">지도 테마</string>
+    <string name="shop_equipped">장착 중</string>
+    <string name="shop_owned">보유 중</string>
+    <string name="shop_equip_title">%1$s, 장착하시겠어요?</string>
+    <string name="shop_equip_confirm">장착하기</string>
+    <string name="shop_equip_cancel">취소</string>
+    <string name="shop_not_enough">코인 부족</string>
+    <string name="shop_max">가득</string>
+    <string name="shop_buy_title">%1$s, 살까요?</string>
+    <string name="shop_buy_desc_shield">하루를 놓친 다음 날 앱을 열면 자동으로 쓰여요. 최대 %1$d개까지 가질 수 있어요.</string>
+    <string name="shop_buy_desc_cosmetic">사면 바로 장착돼요. 언제든 바꿔 낄 수 있어요.</string>
+    <string name="shop_buy_balance">보유 코인</string>
+    <string name="shop_buy_price">가격</string>
+    <string name="shop_buy_after">구매 후</string>
+    <string name="shop_buy_confirm">%1$s 코인으로 구매</string>
+    <string name="shop_buy_cancel">다음에 할게요</string>
+
+    <string name="item_shield">불꽃 방패</string>
+    <string name="item_brainy_pink">분홍 브레니</string>
+    <string name="item_brainy_mint">민트 브레니</string>
+    <string name="item_brainy_sky">하늘 브레니</string>
+    <string name="item_brainy_yellow">노랑 브레니</string>
+    <string name="item_brainy_rainbow">무지개 브레니</string>
+    <string name="item_tile_gem">보석</string>
+    <string name="item_tile_fruit">과일</string>
+    <string name="item_tile_star">별</string>
+    <string name="item_theme_night">밤하늘</string>
+    <string name="item_theme_ocean">바다</string>
+    <string name="item_theme_space">우주정거장</string>
+</resources>
