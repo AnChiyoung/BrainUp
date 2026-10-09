@@ -61,20 +61,28 @@ import com.dev.goodluckcy.brainup.feature.game.HeartChip
 import com.dev.goodluckcy.brainup.feature.game.PrimaryGameButton
 import com.dev.goodluckcy.brainup.feature.game.ProgressDots
 import com.dev.goodluckcy.brainup.feature.game.ScoreChip
+import com.dev.goodluckcy.brainup.feature.shop.EquippedItemsViewModel
+import com.dev.goodluckcy.brainup.core.designsystem.TileSkinStyle
+import com.dev.goodluckcy.brainup.core.designsystem.tileSkin
+import com.dev.goodluckcy.brainup.domain.model.ItemSlot
+import com.dev.goodluckcy.brainup.domain.model.ShopItem
 
 @Composable
 fun PatternMemoryScreen(
     onBack: () -> Unit,
     onFinish: (GameResult) -> Unit,
     viewModel: PatternMemoryViewModel = hiltViewModel(),
+    equippedItems: EquippedItemsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val inventory by equippedItems.inventory.collectAsStateWithLifecycle()
 
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onStop() }
     LifecycleEventEffect(Lifecycle.Event.ON_START) { viewModel.onStart() }
 
     PatternMemoryContent(
         uiState = uiState,
+        tileSkin = inventory.equippedIn(ItemSlot.TILE_SKIN).tileSkin,
         onBack = onBack,
         onStart = viewModel::start,
         onTileTap = viewModel::onTileTap,
@@ -86,6 +94,7 @@ fun PatternMemoryScreen(
 @Composable
 private fun PatternMemoryContent(
     uiState: PatternMemoryUiState,
+    tileSkin: TileSkinStyle,
     onBack: () -> Unit,
     onStart: () -> Unit,
     onTileTap: (Int) -> Unit,
@@ -131,7 +140,7 @@ private fun PatternMemoryContent(
         ) {
             // 작은 화면에서도 위아래 요소와 겹치지 않도록 너비·높이 중 작은 쪽에 맞춘다.
             val side = minOf(maxWidth, maxHeight, MAX_BOARD_SIZE)
-            TileBoard(uiState = uiState, onTileTap = onTileTap, modifier = Modifier.size(side))
+            TileBoard(uiState = uiState, skin = tileSkin, onTileTap = onTileTap, modifier = Modifier.size(side))
         }
         when (uiState.phase) {
             GamePhase.Ready -> PrimaryGameButton(stringResource(R.string.action_start), onStart)
@@ -156,6 +165,7 @@ private fun instructionText(uiState: PatternMemoryUiState): String = when (uiSta
 @Composable
 private fun TileBoard(
     uiState: PatternMemoryUiState,
+    skin: TileSkinStyle,
     onTileTap: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -183,6 +193,7 @@ private fun TileBoard(
                     GemTile(
                         tile = tile,
                         uiState = uiState,
+                        skin = skin,
                         onClick = { onTileTap(tile) },
                         modifier = Modifier
                             .weight(1f)
@@ -194,30 +205,33 @@ private fun TileBoard(
     }
 }
 
-/** 보석처럼 아래쪽이 진한 타일. 점등되면 하늘색으로 빛난다. */
+/** 아래쪽이 진한 입체 타일. 점등되면 스킨 색으로 빛난다. */
 @Composable
 private fun GemTile(
     tile: Int,
     uiState: PatternMemoryUiState,
+    skin: TileSkinStyle,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (face, bottom) = when (tile) {
         uiState.wrongTile -> Danger to Color(0xFFB8262D)
-        uiState.expectedTile -> SkyGlow to Sky
-        uiState.litTile -> SkyGlow to Sky
+        uiState.expectedTile -> skin.lit to skin.litBottom
+        uiState.litTile -> skin.lit to skin.litBottom
         uiState.flashedTile -> Go to Mint
         else -> NightLight to Night
     }
     val glowing = tile == uiState.litTile || tile == uiState.expectedTile
-    val shape = RoundedCornerShape(22.dp)
+    val shape = skin.shape
     val description = stringResource(R.string.pattern_tile, tile + 1)
     Box(
         modifier = modifier
             .drawBehind {
-                if (glowing) {
+                if (glowing && skin.round) {
+                    drawCircle(skin.lit.copy(alpha = 0.45f), radius = size.minDimension / 2 + 7.dp.toPx())
+                } else if (glowing) {
                     drawRoundRect(
-                        color = SkyGlow.copy(alpha = 0.45f),
+                        color = skin.lit.copy(alpha = 0.45f),
                         topLeft = Offset(-7.dp.toPx(), -7.dp.toPx()),
                         size = Size(size.width + 14.dp.toPx(), size.height + 14.dp.toPx()),
                         cornerRadius = CornerRadius(28.dp.toPx()),
@@ -226,8 +240,8 @@ private fun GemTile(
             }
             .chunky(color = face, shape = shape, depth = 0.dp)
             .drawBehind {
-                // 아래쪽 진한 띠로 보석 같은 입체감
-                drawRoundRect(
+                // 아래쪽 진한 띠로 보석 같은 입체감(동그란 타일은 생략)
+                if (!skin.round) drawRoundRect(
                     color = bottom,
                     topLeft = Offset(3.dp.toPx(), size.height - 11.dp.toPx()),
                     size = Size(size.width - 6.dp.toPx(), 8.dp.toPx()),
@@ -237,16 +251,16 @@ private fun GemTile(
             .then(if (tile == uiState.expectedTile) Modifier.border(4.dp, Sun, shape) else Modifier)
             .clickable(enabled = uiState.isInputEnabled, role = Role.Button, onClick = onClick)
             .semantics { contentDescription = description },
-        contentAlignment = Alignment.TopStart,
+        contentAlignment = if (skin.round) Alignment.Center else Alignment.TopStart,
     ) {
         if (glowing) {
             GameIcon(
-                icon = GameIcons.Sparkle,
+                icon = skin.litIcon,
                 size = 22.dp,
-                tint = Color.White,
-                fill = Color.White,
-                strokeWidth = 1f,
-                modifier = Modifier.padding(10.dp),
+                tint = skin.litIconTint,
+                fill = skin.litIconFill,
+                strokeWidth = 1.4f,
+                modifier = if (skin.round) Modifier else Modifier.padding(10.dp),
             )
         }
     }
@@ -260,6 +274,7 @@ private val BUTTON_SPACE = 66.dp
 private fun PatternMemoryPlaybackPreview() {
     BrainUpTheme {
         PatternMemoryContent(
+            tileSkin = ShopItem.TILE_GEM.tileSkin,
             uiState = PatternMemoryUiState(
                 phase = GamePhase.Memorizing,
                 round = 2,
@@ -281,6 +296,7 @@ private fun PatternMemoryPlaybackPreview() {
 private fun PatternMemoryFinishedPreview() {
     BrainUpTheme {
         PatternMemoryContent(
+            tileSkin = ShopItem.TILE_GEM.tileSkin,
             uiState = PatternMemoryUiState(
                 phase = GamePhase.Finished,
                 round = 2,

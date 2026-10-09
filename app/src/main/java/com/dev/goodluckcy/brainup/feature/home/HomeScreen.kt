@@ -54,6 +54,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -62,7 +64,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.ads.BannerAd
+import com.dev.goodluckcy.brainup.core.designsystem.brainyBackground
 import com.dev.goodluckcy.brainup.core.designsystem.color
+import com.dev.goodluckcy.brainup.core.designsystem.formatCoins
+import com.dev.goodluckcy.brainup.core.designsystem.skyPalette
 import com.dev.goodluckcy.brainup.core.designsystem.component.BrainyFace
 import com.dev.goodluckcy.brainup.core.designsystem.component.CoinDot
 import com.dev.goodluckcy.brainup.core.designsystem.component.GameButton
@@ -76,7 +81,6 @@ import com.dev.goodluckcy.brainup.core.designsystem.component.nightSky
 import com.dev.goodluckcy.brainup.core.designsystem.component.tabBarPadding
 import com.dev.goodluckcy.brainup.core.designsystem.icon
 import com.dev.goodluckcy.brainup.core.designsystem.theme.BrainUpTheme
-import com.dev.goodluckcy.brainup.core.designsystem.theme.Brainy
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Ink
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Lavender
 import com.dev.goodluckcy.brainup.core.designsystem.theme.NightPath
@@ -92,23 +96,32 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomeScreen(
     onGameClick: (GameType) -> Unit,
+    onOpenShop: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeContent(uiState = uiState, onGameClick = onGameClick)
+    HomeContent(uiState = uiState, onGameClick = onGameClick, onOpenChest = viewModel::openChest)
+    HomeDialogHost(
+        uiState = uiState,
+        onClaimChest = viewModel::claimChest,
+        onDismiss = viewModel::dismissDialog,
+        onOpenShop = onOpenShop,
+    )
 }
 
 @Composable
 private fun HomeContent(
     uiState: HomeUiState,
     onGameClick: (GameType) -> Unit,
+    onOpenChest: () -> Unit,
 ) {
     // 아직 오늘 안 한 첫 게임이 '다음 스테이지'. 모두 끝냈으면 처음 게임을 한 판 더.
     val nextGame = GameType.entries.firstOrNull { it !in uiState.completedGames }
+    val sky = uiState.mapTheme.skyPalette
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .nightSky(variant = 0)
+            .nightSky(variant = 0, ground = sky.ground, planet = sky.planet, accentPlanet = sky.accentPlanet)
             .statusBarsPadding()
             .tabBarPadding(),
     ) {
@@ -117,12 +130,15 @@ private fun HomeContent(
             uiState = uiState,
             nextGame = nextGame,
             onGameClick = onGameClick,
+            onOpenChest = onOpenChest,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
         )
         GameButton(
-            onClick = { onGameClick(nextGame ?: GameType.entries.first()) },
+            onClick = {
+                if (uiState.isChestReady) onOpenChest() else onGameClick(nextGame ?: GameType.entries.first())
+            },
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth()
@@ -130,26 +146,43 @@ private fun HomeContent(
             depth = 7.dp,
             shape = RoundedCornerShape(22.dp),
         ) {
-            GameIcon(icon = GameIcons.Play, size = 26.dp, tint = Ink, fill = Ink, strokeWidth = 1f)
-            Spacer(Modifier.width(10.dp))
-            Column {
+            if (uiState.isChestReady) {
+                TreasureChest(modifier = Modifier.size(width = 34.dp, height = 28.dp), open = true)
+                Spacer(Modifier.width(10.dp))
                 Text(
-                    text = stringResource(if (nextGame != null) R.string.home_play else R.string.home_play_again),
+                    text = stringResource(R.string.home_open_chest),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Ink,
                 )
-                Text(
-                    text = if (nextGame != null) {
-                        stringResource(R.string.home_play_next, stringResource(nextGame.titleRes))
-                    } else {
-                        stringResource(R.string.home_all_clear)
-                    },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Ink,
-                )
+            } else {
+                PlayButtonLabel(nextGame)
             }
         }
         BannerAd(modifier = Modifier.padding(top = 8.dp))
+    }
+}
+
+@Composable
+private fun PlayButtonLabel(nextGame: GameType?) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        GameIcon(icon = GameIcons.Play, size = 26.dp, tint = Ink, fill = Ink, strokeWidth = 1f)
+        Spacer(Modifier.width(10.dp))
+        Column {
+            Text(
+                text = stringResource(if (nextGame != null) R.string.home_play else R.string.home_play_again),
+                style = MaterialTheme.typography.headlineSmall,
+                color = Ink,
+            )
+            Text(
+                text = if (nextGame != null) {
+                    stringResource(R.string.home_play_next, stringResource(nextGame.titleRes))
+                } else {
+                    stringResource(R.string.home_all_clear)
+                },
+                style = MaterialTheme.typography.labelMedium,
+                color = Ink,
+            )
+        }
     }
 }
 
@@ -158,17 +191,18 @@ private fun HomeHud(uiState: HomeUiState) {
     val dateText = remember {
         LocalDate.now().format(DateTimeFormatter.ofPattern("M월 d일 EEEE", Locale.KOREAN))
     }
+    val coinDesc = stringResource(R.string.coin_balance_desc, formatCoins(uiState.coins))
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .background(Brainy, RoundedCornerShape(16.dp))
+                .brainyBackground(uiState.brainy, RoundedCornerShape(16.dp))
                 .border(OutlineWidth, Color.White, RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center,
         ) {
@@ -182,11 +216,21 @@ private fun HomeHud(uiState: HomeUiState) {
                 color = Color.White,
             )
         }
-        if (uiState.todayScore > 0) {
-            HudChip(text = uiState.todayScore.toString()) { CoinDot() }
-        }
+        HudChip(
+            text = formatCoins(uiState.coins),
+            modifier = Modifier.semantics(mergeDescendants = true) {
+                contentDescription = coinDesc
+            },
+        ) { CoinDot(size = 20.dp) }
         HudChip(text = uiState.streakDays.toString()) {
             GameIcon(icon = GameIcons.Flame, size = 18.dp, tint = Orange, fill = Orange, strokeWidth = 1.5f)
+        }
+        if (uiState.shields > 0) {
+            val shieldDesc = stringResource(R.string.shield_count_desc, uiState.shields)
+            HudChip(
+                text = uiState.shields.toString(),
+                modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = shieldDesc },
+            ) { ShieldChipIcon() }
         }
     }
 }
@@ -204,6 +248,7 @@ private fun AdventureMap(
     uiState: HomeUiState,
     nextGame: GameType?,
     onGameClick: (GameType) -> Unit,
+    onOpenChest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -219,22 +264,53 @@ private fun AdventureMap(
         }
         MapPath(progress = pathProgress.value, modifier = Modifier.fillMaxSize())
 
-        val chestCompleted = uiState.isDailyCompleted
+        val chestReady = uiState.isChestReady
         val chestAppear = rememberPopIn(delayMs = CHEST_APPEAR_MS)
+        val chestHop = if (chestReady) rememberIdleHop() else 0f
+        val chestLabel = stringResource(R.string.home_open_chest)
         Column(
             modifier = Modifier
                 .offset(
                     x = mapWidth * ChestPosition.x - 70.dp,
-                    y = mapHeight * ChestPosition.y - nodeSize * 0.35f,
+                    // "열기!" 말풍선이 붙어도 상자 자리는 그대로 둔다.
+                    y = mapHeight * ChestPosition.y - nodeSize * 0.35f - if (chestReady) ChestBubbleSpace else 0.dp,
                 )
                 .width(140.dp)
-                .popInLayer(chestAppear),
+                .popInLayer(chestAppear)
+                .clickable(
+                    enabled = chestReady,
+                    interactionSource = null,
+                    indication = null,
+                    onClickLabel = chestLabel,
+                    role = Role.Button,
+                    onClick = onOpenChest,
+                ),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
+            if (chestReady) {
+                Text(
+                    text = stringResource(R.string.chest_open_bubble),
+                    modifier = Modifier
+                        .graphicsLayer { translationY = chestHop.dp.toPx() }
+                        .padding(bottom = 3.dp)
+                        .chunky(color = Color.White, shape = RoundedCornerShape(10.dp), depth = 3.dp, borderWidth = 2.dp)
+                        .padding(horizontal = 10.dp, vertical = 3.dp),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Ink,
+                )
+            }
             TreasureChest(
-                modifier = Modifier.size(width = nodeSize, height = nodeSize * 0.75f),
-                open = chestCompleted,
+                modifier = Modifier
+                    .graphicsLayer { translationY = chestHop.dp.toPx() }
+                    .drawBehind {
+                        if (chestReady) {
+                            drawCircle(Sun.copy(alpha = 0.35f), radius = size.maxDimension * 0.75f)
+                            drawCircle(Sun.copy(alpha = 0.25f), radius = size.maxDimension * 0.95f)
+                        }
+                    }
+                    .size(width = nodeSize, height = nodeSize * 0.75f),
+                open = uiState.chestClaimed,
             )
             Text(
                 text = stringResource(R.string.home_chest, uiState.completedCount, uiState.totalCount),
@@ -266,6 +342,7 @@ private fun AdventureMap(
 }
 
 private val NodeColumnWidth = 150.dp
+private val ChestBubbleSpace = 30.dp
 private val BubbleSpace = 36.dp
 
 @Composable
@@ -445,6 +522,7 @@ private fun HomeContentPreview() {
                 streakDays = 4,
             ),
             onGameClick = {},
+            onOpenChest = {},
         )
     }
 }

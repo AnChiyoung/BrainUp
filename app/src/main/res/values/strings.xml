@@ -70,7 +70,6 @@
     <string name="result_stage_clear">스테이지 클리어!</string>
     <string name="result_first_sticker">첫 기록!</string>
     <string name="result_new_best_sticker">최고 기록 갱신!</string>
-    <string name="result_chest_remaining">보물상자까지 %1$d스테이지!</string>
     <string name="result_chest_opened">보물상자 오픈! 오늘의 모험 완료</string>
     <string name="action_next_stage">다음 스테이지: %1$s</string>
     <string name="action_to_map">지도로</string>

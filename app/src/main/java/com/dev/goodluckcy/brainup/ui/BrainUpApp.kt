@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -93,20 +94,20 @@ private fun GameTabBar(
         TopLevelDestination.entries.forEach { destination ->
             val selected = isSelected(destination)
             val contentColor = if (selected) Ink else Color.White
-            Row(
+            Column(
                 modifier = Modifier
                     .weight(1f)
                     .height(52.dp)
                     .background(if (selected) Sun else Color.Transparent, RoundedCornerShape(16.dp))
                     .semantics { this.selected = selected }
                     .clickable(role = Role.Tab) { onSelect(destination) },
-                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                GameIcon(icon = destination.icon, size = 22.dp, tint = contentColor)
+                GameIcon(icon = destination.icon, size = 20.dp, tint = contentColor)
                 Text(
                     text = stringResource(destination.labelRes),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.labelMedium,
                     color = contentColor,
                 )
             }

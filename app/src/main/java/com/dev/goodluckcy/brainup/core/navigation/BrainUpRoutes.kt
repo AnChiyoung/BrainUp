@@ -11,6 +11,9 @@ data object HomeRoute
 data object StatsRoute
 
 @Serializable
+data object ShopRoute
+
+@Serializable
 data object SettingsRoute
 
 @Serializable

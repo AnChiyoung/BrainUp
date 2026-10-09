@@ -40,6 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.goodluckcy.brainup.R
 import com.dev.goodluckcy.brainup.core.ads.LocalAdServices
 import com.dev.goodluckcy.brainup.core.designsystem.color
+import com.dev.goodluckcy.brainup.core.designsystem.component.CoinDot
+import com.dev.goodluckcy.brainup.core.designsystem.formatCoins
 import com.dev.goodluckcy.brainup.core.designsystem.component.GameButton
 import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcon
 import com.dev.goodluckcy.brainup.core.designsystem.component.GameIcons
@@ -62,6 +64,10 @@ import com.dev.goodluckcy.brainup.core.designsystem.theme.Sky
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Sun
 import com.dev.goodluckcy.brainup.core.designsystem.theme.SunDark
 import com.dev.goodluckcy.brainup.core.designsystem.titleRes
+import com.dev.goodluckcy.brainup.domain.model.CoinGain
+import com.dev.goodluckcy.brainup.domain.model.CoinReward
+import com.dev.goodluckcy.brainup.domain.model.CoinRules
+import com.dev.goodluckcy.brainup.domain.model.CoinSource
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.GameType
 import com.dev.goodluckcy.brainup.domain.model.RecordOutcome
@@ -145,6 +151,7 @@ private fun ResultContent(
         )
         uiState.outcome?.let { PersonalBestSticker(it) }
         StatChips(result)
+        uiState.coinReward?.let { CoinPanel(it) }
         uiState.outcome?.let { ChestProgress(it) }
         Spacer(Modifier.weight(1f))
         PrimaryGameButton(
@@ -257,7 +264,11 @@ private fun ChestProgress(outcome: RecordOutcome) {
                     text = when {
                         outcome.dailyCompletedNow -> stringResource(R.string.result_chest_opened)
                         completed -> stringResource(R.string.home_all_clear)
-                        else -> stringResource(R.string.result_chest_remaining, total - outcome.todayCompletedCount)
+                        else -> stringResource(
+                            R.string.result_chest_remaining_coin,
+                            total - outcome.todayCompletedCount,
+                            CoinRules.CHEST,
+                        )
                     },
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
@@ -280,6 +291,76 @@ private fun ChestProgress(outcome: RecordOutcome) {
         }
     }
 }
+
+/** 이번 판에 얻은 코인 내역 */
+@Composable
+private fun CoinPanel(reward: CoinReward) {
+    GamePanel(modifier = Modifier.fillMaxWidth(), depth = 5.dp) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                CoinDot(size = 18.dp)
+                Text(
+                    text = stringResource(R.string.coin_result_title),
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                )
+                Text(
+                    text = if (reward.gameLimitReached) {
+                        stringResource(R.string.coin_result_limit)
+                    } else {
+                        stringResource(R.string.coin_result_games_today, reward.rewardedGamesToday, CoinRules.DAILY_GAME_LIMIT)
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Lavender,
+                )
+            }
+            reward.gains.forEach { gain ->
+                CoinLine(label = stringResource(gain.source.labelRes), amount = gain.amount, color = Lavender)
+            }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp)
+                    .height(2.dp)
+                    .background(Night, RoundedCornerShape(1.dp)),
+            )
+            CoinLine(label = stringResource(R.string.coin_result_total), amount = reward.total, color = Color.White)
+            Text(
+                text = stringResource(
+                    R.string.coin_result_balance,
+                    formatCoins(reward.balanceBefore),
+                    formatCoins(reward.balanceAfter),
+                ),
+                modifier = Modifier.align(Alignment.End),
+                style = MaterialTheme.typography.labelMedium,
+                color = Lavender,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CoinLine(label: String, amount: Int, color: Color) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, color = color)
+        Text(
+            text = stringResource(R.string.coin_plus, formatCoins(amount)),
+            style = MaterialTheme.typography.titleMedium,
+            color = Sun,
+        )
+    }
+}
+
+private val CoinSource.labelRes: Int
+    get() = when (this) {
+        CoinSource.PERSONAL_BEST -> R.string.coin_source_personal_best
+        CoinSource.STREAK_BONUS -> R.string.coin_source_streak_bonus
+        else -> R.string.coin_source_game_complete
+    }
 
 private fun formatDuration(durationMs: Long): String {
     val totalSeconds = durationMs / 1000
@@ -305,6 +386,15 @@ private fun ResultContentPreview() {
                     dailyCompletedNow = false,
                     todayCompletedCount = 2,
                     todayTotalScore = 870,
+                ),
+                coinReward = CoinReward(
+                    gains = listOf(
+                        CoinGain(CoinSource.GAME_COMPLETE, 10),
+                        CoinGain(CoinSource.PERSONAL_BEST, 20),
+                    ),
+                    balanceAfter = 1270,
+                    rewardedGamesToday = 7,
+                    gameLimitReached = false,
                 ),
             ),
             onRetry = {},

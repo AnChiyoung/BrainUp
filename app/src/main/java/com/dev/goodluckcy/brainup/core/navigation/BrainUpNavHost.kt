@@ -16,6 +16,7 @@ import com.dev.goodluckcy.brainup.feature.numbermemory.NumberMemoryScreen
 import com.dev.goodluckcy.brainup.feature.pattern.PatternMemoryScreen
 import com.dev.goodluckcy.brainup.feature.reaction.ReactionScreen
 import com.dev.goodluckcy.brainup.feature.result.ResultScreen
+import com.dev.goodluckcy.brainup.feature.shop.ShopScreen
 import com.dev.goodluckcy.brainup.feature.settings.SettingsScreen
 import com.dev.goodluckcy.brainup.feature.stats.StatsScreen
 
@@ -35,9 +36,13 @@ fun BrainUpNavHost(
         popExitTransition = { fadeOut(tween(SCREEN_FADE_MS)) },
     ) {
         composable<HomeRoute> {
-            HomeScreen(onGameClick = { gameType -> navController.navigate(GameRoute(gameType)) })
+            HomeScreen(
+                onGameClick = { gameType -> navController.navigate(GameRoute(gameType)) },
+                onOpenShop = { navController.navigateToTopLevel(TopLevelDestination.SHOP) },
+            )
         }
         composable<StatsRoute> { StatsScreen() }
+        composable<ShopRoute> { ShopScreen() }
         composable<SettingsRoute> { SettingsScreen() }
         composable<GameRoute> { entry ->
             val gameType = entry.toRoute<GameRoute>().gameType

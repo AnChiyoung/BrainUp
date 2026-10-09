@@ -15,5 +15,6 @@ enum class TopLevelDestination(
 ) {
     HOME(HomeRoute, HomeRoute::class, GameIcons.Map, R.string.nav_home),
     STATS(StatsRoute, StatsRoute::class, GameIcons.Trophy, R.string.nav_stats),
+    SHOP(ShopRoute, ShopRoute::class, GameIcons.Store, R.string.nav_shop),
     SETTINGS(SettingsRoute, SettingsRoute::class, GameIcons.Sliders, R.string.nav_settings),
 }

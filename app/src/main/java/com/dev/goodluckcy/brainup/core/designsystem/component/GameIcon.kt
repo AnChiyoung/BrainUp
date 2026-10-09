@@ -52,6 +52,9 @@ object GameIcons {
         "M17 11a2 2 0 0 1 4 0v3a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-2.6-4.4a1.8 1.8 0 0 1 3.1-1.8L9 13",
     )
     val Sparkle = GameIconSpec("M12 2l2 7 7 3-7 3-2 7-2-7-7-3 7-3z")
+    val Shield = GameIconSpec("M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z")
+    val Store = GameIconSpec("M3 9l2-5h14l2 5", "M3 9h18", "M5 9v11h14V9", "M10 20v-6h4v6")
+    val Lock = GameIconSpec("M6 11h12v9H6z", "M8 11V8a4 4 0 0 1 8 0v3")
 }
 
 @Composable

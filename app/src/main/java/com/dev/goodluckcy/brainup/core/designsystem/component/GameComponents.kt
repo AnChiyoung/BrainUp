@@ -271,9 +271,14 @@ fun BrainyFace(modifier: Modifier = Modifier) {
     }
 }
 
-/** 밤하늘 배경: 행성 원 두 개와 작은 별. 화면마다 [variant]로 배치를 바꾼다. */
-fun Modifier.nightSky(variant: Int = 0): Modifier = this
-    .background(Night)
+/** 밤하늘 배경: 행성 원 두 개와 작은 별. 화면마다 [variant]로 배치를, 지도 테마로 색을 바꾼다. */
+fun Modifier.nightSky(
+    variant: Int = 0,
+    ground: Color = Night,
+    planet: Color = NightLight,
+    accentPlanet: Color? = null,
+): Modifier = this
+    .background(ground)
     .drawBehind {
         val w = size.width
         val h = size.height
@@ -282,7 +287,8 @@ fun Modifier.nightSky(variant: Int = 0): Modifier = this
             1 -> listOf(Offset(w * 0.95f, h * 0.15f) to w * 0.28f, Offset(w * 0.05f, h * 0.85f) to w * 0.32f)
             else -> listOf(Offset(w * 0.5f, h * 0.22f) to w * 0.40f, Offset(w * 0.9f, h * 0.9f) to w * 0.25f)
         }
-        planets.forEach { (center, radius) -> drawCircle(NightLight, radius, center) }
+        planets.forEach { (center, radius) -> drawCircle(planet, radius, center) }
+        accentPlanet?.let { drawCircle(it, w * 0.07f, Offset(w * 0.82f, h * 0.12f)) }
         val stars = listOf(0.10f to 0.18f, 0.85f to 0.25f, 0.18f to 0.50f, 0.90f to 0.56f, 0.48f to 0.39f, 0.70f to 0.70f)
         stars.forEachIndexed { i, (x, y) ->
             drawCircle(if (i % 2 == 0) Color.White else Color(0xFFB9AEFF), if (i % 3 == 0) 3.dp.toPx() else 2.dp.toPx(), Offset(w * x, h * y))

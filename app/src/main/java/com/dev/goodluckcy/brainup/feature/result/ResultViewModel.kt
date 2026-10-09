@@ -10,8 +10,10 @@ import com.dev.goodluckcy.brainup.core.analytics.AnalyticsEvent
 import com.dev.goodluckcy.brainup.core.analytics.AnalyticsLogger
 import com.dev.goodluckcy.brainup.core.common.di.ApplicationScope
 import com.dev.goodluckcy.brainup.core.navigation.ResultRoute
+import com.dev.goodluckcy.brainup.domain.model.CoinReward
 import com.dev.goodluckcy.brainup.domain.model.GameResult
 import com.dev.goodluckcy.brainup.domain.model.RecordOutcome
+import com.dev.goodluckcy.brainup.domain.repository.CoinRepository
 import com.dev.goodluckcy.brainup.domain.repository.GameRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -27,12 +29,15 @@ data class ResultUiState(
     val result: GameResult,
     /** 저장이 끝나기 전에는 null */
     val outcome: RecordOutcome? = null,
+    /** 코인 지급이 끝나기 전에는 null */
+    val coinReward: CoinReward? = null,
 )
 
 @HiltViewModel
 class ResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     repository: GameRecordRepository,
+    coinRepository: CoinRepository,
     analytics: AnalyticsLogger,
     adFrequencyStore: AdFrequencyStore,
     @ApplicationScope applicationScope: CoroutineScope,
@@ -52,17 +57,25 @@ class ResultViewModel @Inject constructor(
             // 결과 화면을 바로 떠나도 저장이 취소되지 않도록 앱 스코프에서 실행한다.
             val saving = applicationScope.async {
                 adFrequencyStore.onGameCompleted()
-                runCatching { repository.record(result) }
+                runCatching {
+                    val outcome = repository.record(result)
+                    if (outcome.dailyCompletedNow) {
+                        analytics.log(AnalyticsEvent.dailyComplete(outcome.todayTotalScore))
+                    }
+                    // 기록 저장 결과(최고 기록·오늘의 도전 완료)에 따라 코인을 지급한다.
+                    val coinReward = coinRepository.rewardGame(
+                        isPersonalBest = outcome.isPersonalBest,
+                        dailyCompletedNow = outcome.dailyCompletedNow,
+                    )
+                    outcome to coinReward
+                }
                     .onFailure { Log.e(TAG, "Failed to save game result", it) }
                     .getOrNull()
-                    ?.also { outcome ->
-                        if (outcome.dailyCompletedNow) {
-                            analytics.log(AnalyticsEvent.dailyComplete(outcome.todayTotalScore))
-                        }
-                    }
             }
             viewModelScope.launch {
-                saving.await()?.let { outcome -> _uiState.update { it.copy(outcome = outcome) } }
+                saving.await()?.let { (outcome, coinReward) ->
+                    _uiState.update { it.copy(outcome = outcome, coinReward = coinReward) }
+                }
             }
         }
     }

@@ -50,6 +50,7 @@ import com.dev.goodluckcy.brainup.core.designsystem.theme.Lavender
 import com.dev.goodluckcy.brainup.core.designsystem.theme.NightDeeper
 import com.dev.goodluckcy.brainup.core.designsystem.theme.NightPath
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Orange
+import com.dev.goodluckcy.brainup.core.designsystem.theme.Sky
 import com.dev.goodluckcy.brainup.core.designsystem.theme.Sun
 import com.dev.goodluckcy.brainup.core.designsystem.titleRes
 import com.dev.goodluckcy.brainup.domain.model.BestRecord
@@ -188,6 +189,23 @@ private fun Stamp(day: DailyProgress, isToday: Boolean, total: Int) {
             contentAlignment = Alignment.Center,
         ) {
             GameIcon(icon = GameIcons.Check, size = 18.dp, tint = Ink, strokeWidth = 3.4f)
+        }
+        // 불꽃 방패로 지킨 날
+        day.shielded -> Box(
+            Modifier
+                .size(size)
+                .background(Sky, CircleShape)
+                .border(3.dp, Ink, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            GameIcon(
+                icon = GameIcons.Shield,
+                size = 20.dp,
+                tint = Ink,
+                fill = Color.White,
+                strokeWidth = 2f,
+                contentDescription = stringResource(R.string.item_shield),
+            )
         }
         isToday -> Box(
             Modifier
