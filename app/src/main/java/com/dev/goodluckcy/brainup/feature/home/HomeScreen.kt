@@ -1,9 +1,22 @@
 package com.dev.goodluckcy.brainup.feature.home
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -23,16 +36,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
@@ -69,6 +86,7 @@ import com.dev.goodluckcy.brainup.domain.model.GameType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -192,14 +210,23 @@ private fun AdventureMap(
         // 작은 화면에서도 노드가 겹치지 않도록 지도 높이에 맞춰 크기를 줄인다.
         val nodeSize = minOf(92.dp, mapHeight * 0.22f)
 
-        MapPath(Modifier.fillMaxSize())
+        // 진입 연출: 길이 아래에서 위로 그려지고, 스테이지가 차례로 통통 튀어나온다.
+        val pathProgress = remember { Animatable(0f) }
+        LaunchedEffect(Unit) {
+            pathProgress.animateTo(1f, tween(durationMillis = PATH_DRAW_MS, easing = FastOutSlowInEasing))
+        }
+        MapPath(progress = pathProgress.value, modifier = Modifier.fillMaxSize())
 
         val chestCompleted = uiState.isDailyCompleted
+        val chestAppear = rememberPopIn(delayMs = CHEST_APPEAR_MS)
         Column(
-            modifier = Modifier.offset(
-                x = mapWidth * ChestPosition.x - 70.dp,
-                y = mapHeight * ChestPosition.y - nodeSize * 0.35f,
-            ).width(140.dp),
+            modifier = Modifier
+                .offset(
+                    x = mapWidth * ChestPosition.x - 70.dp,
+                    y = mapHeight * ChestPosition.y - nodeSize * 0.35f,
+                )
+                .width(140.dp)
+                .popInLayer(chestAppear),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
@@ -225,6 +252,7 @@ private fun AdventureMap(
                 done = gameType in uiState.completedGames,
                 isNext = gameType == nextGame,
                 nodeSize = nodeSize,
+                appearDelayMs = NODE_APPEAR_START_MS + gameType.ordinal * NODE_APPEAR_STEP_MS,
                 onClick = { onGameClick(gameType) },
                 modifier = Modifier.offset(
                     x = mapWidth * position.x - NodeColumnWidth / 2,
@@ -239,7 +267,7 @@ private val NodeColumnWidth = 150.dp
 private val BubbleSpace = 36.dp
 
 @Composable
-private fun MapPath(modifier: Modifier) {
+private fun MapPath(progress: Float, modifier: Modifier) {
     Canvas(modifier = modifier) {
         fun at(p: Offset) = Offset(size.width * p.x, size.height * p.y)
         val number = at(NodePositions.getValue(GameType.NUMBER_MEMORY))
@@ -251,6 +279,10 @@ private fun MapPath(modifier: Modifier) {
             cubicTo(number.x, number.y - 90f, reaction.x, reaction.y + 120f, reaction.x, reaction.y)
             cubicTo(reaction.x, reaction.y - 120f, pattern.x, pattern.y + 120f, pattern.x, pattern.y)
             cubicTo(pattern.x, pattern.y - 120f, chest.x, chest.y + 120f, chest.x, chest.y)
+        }.let { full ->
+            // 진행률만큼만 잘라 그린다.
+            val measure = PathMeasure().apply { setPath(full, false) }
+            Path().also { measure.getSegment(0f, measure.length * progress, it, true) }
         }
         drawPath(path, NightPath, style = Stroke(width = 18.dp.toPx(), cap = StrokeCap.Round))
         drawPath(
@@ -271,19 +303,38 @@ private fun MapNode(
     done: Boolean,
     isNext: Boolean,
     nodeSize: Dp,
+    appearDelayMs: Long,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val title = stringResource(gameType.titleRes)
+    val appear = rememberPopIn(delayMs = appearDelayMs)
+    // 다음 스테이지는 계속 통통 튀어 눈에 띄게 한다.
+    val hop = if (isNext) rememberIdleHop() else 0f
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    val pressScale by animateFloatAsState(
+        targetValue = if (pressed) 0.88f else 1f,
+        animationSpec = spring(dampingRatio = 0.4f, stiffness = Spring.StiffnessMedium),
+        label = "pressScale",
+    )
     Column(
         modifier = modifier
             .width(NodeColumnWidth)
-            .clickable(onClickLabel = title, role = Role.Button, onClick = onClick),
+            .popInLayer(appear)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClickLabel = title,
+                role = Role.Button,
+                onClick = onClick,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(R.string.home_next_stage),
             modifier = Modifier
+                .graphicsLayer { translationY = hop.dp.toPx() }
                 .alpha(if (isNext) 1f else 0f)
                 .padding(bottom = 6.dp)
                 .chunky(color = Color.White, shape = RoundedCornerShape(10.dp), depth = 3.dp, borderWidth = 2.dp)
@@ -291,7 +342,14 @@ private fun MapNode(
             style = MaterialTheme.typography.titleSmall,
             color = Ink,
         )
-        Box(contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.graphicsLayer {
+                translationY = hop.dp.toPx()
+                scaleX = pressScale
+                scaleY = pressScale
+            },
+            contentAlignment = Alignment.Center,
+        ) {
             Box(
                 modifier = Modifier
                     .size(nodeSize)
@@ -327,6 +385,52 @@ private fun MapNode(
         )
     }
 }
+
+/** 지연 후 0 → 1로 튀어 오르는 등장 값(스프링이라 1을 살짝 넘었다 돌아온다) */
+@Composable
+private fun rememberPopIn(delayMs: Long): Float {
+    val appear = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        delay(delayMs)
+        appear.animateTo(1f, spring(dampingRatio = 0.42f, stiffness = Spring.StiffnessMediumLow))
+    }
+    return appear.value
+}
+
+private fun Modifier.popInLayer(appear: Float): Modifier = graphicsLayer {
+    scaleX = appear
+    scaleY = appear
+    alpha = appear.coerceIn(0f, 1f)
+    transformOrigin = TransformOrigin(0.5f, 0.65f)
+}
+
+/** 위로 톡 뛰었다가 한 번 더 작게 튀고 잠시 쉬는 반복 움직임(dp) */
+@Composable
+private fun rememberIdleHop(): Float {
+    val transition = rememberInfiniteTransition(label = "idleHop")
+    val hop by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            keyframes {
+                durationMillis = 1400
+                0f at 0
+                -12f at 220 using FastOutSlowInEasing
+                0f at 440 using FastOutLinearInEasing
+                -4f at 560 using FastOutSlowInEasing
+                0f at 680 using FastOutLinearInEasing
+                0f at 1400
+            },
+        ),
+        label = "hop",
+    )
+    return hop
+}
+
+private const val PATH_DRAW_MS = 650
+private const val NODE_APPEAR_START_MS = 300L
+private const val NODE_APPEAR_STEP_MS = 150L
+private const val CHEST_APPEAR_MS = 800L
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 760)
 @Composable
