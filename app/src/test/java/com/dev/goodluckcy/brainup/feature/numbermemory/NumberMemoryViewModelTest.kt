@@ -125,7 +125,8 @@ class NumberMemoryViewModelTest {
     fun `memorizing restarts from the beginning after returning from background`() = runTest(dispatcher) {
         viewModel.start()
         val sequence = state.sequence
-        advanceTimeBy(2_000)
+        // 암기 도중(절반 지점)에 백그라운드로 간다.
+        advanceTimeBy(state.memorizeDurationMs / 2)
         viewModel.onStop()
         advanceUntilIdle()
         assertEquals(GamePhase.Memorizing, state.phase)

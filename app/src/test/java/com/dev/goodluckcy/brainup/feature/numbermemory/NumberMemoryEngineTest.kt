@@ -26,9 +26,9 @@ class NumberMemoryEngineTest {
     }
 
     @Test
-    fun `memorize duration is three seconds for three digits plus half second per extra digit`() {
-        assertEquals(3_000L, engine.memorizeDurationMs(3))
-        assertEquals(4_000L, engine.memorizeDurationMs(5))
+    fun `memorize duration is one second for three digits plus 200ms per extra digit`() {
+        assertEquals(1_000L, engine.memorizeDurationMs(3))
+        assertEquals(1_400L, engine.memorizeDurationMs(5))
     }
 
     @Test

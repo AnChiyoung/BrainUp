@@ -8,7 +8,7 @@ import kotlin.random.Random
  *
  * - 라운드는 1부터 시작하며 [ROUNDS_PER_LEVEL] 라운드마다 레벨이 1 오른다.
  * - 레벨 1은 숫자 [START_LENGTH]개, 레벨이 오를 때마다 1개씩 늘어난다(최대 [MAX_LENGTH]).
- * - 표시 시간은 3개 기준 3초, 숫자 1개당 0.5초씩 늘어난다.
+ * - 표시 시간은 3개 기준 1초, 숫자 1개당 0.2초씩 늘어난다.
  * - 라운드 성공 시 (숫자 개수 × [POINTS_PER_DIGIT])점을 얻는다.
  */
 class NumberMemoryEngine @Inject constructor(
@@ -36,7 +36,7 @@ class NumberMemoryEngine @Inject constructor(
         const val MAX_LENGTH = 15
         const val ROUNDS_PER_LEVEL = 2
         const val POINTS_PER_DIGIT = 10
-        const val BASE_MEMORIZE_MS = 3_000L
-        const val MEMORIZE_MS_PER_EXTRA_DIGIT = 500L
+        const val BASE_MEMORIZE_MS = 1_000L
+        const val MEMORIZE_MS_PER_EXTRA_DIGIT = 200L
     }
 }
