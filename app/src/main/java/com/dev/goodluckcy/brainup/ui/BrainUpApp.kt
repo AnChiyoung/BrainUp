@@ -22,6 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +63,8 @@ fun BrainUpApp() {
             navController = navController,
             modifier = Modifier.fillMaxSize(),
         )
+        // 첫 실행 인트로. 그 아래에서 지도와 광고는 미리 준비된다. 화면 회전 뒤에는 다시 보여주지 않는다.
+        var showIntro by rememberSaveable { mutableStateOf(true) }
         AnimatedVisibility(
             visible = showBottomBar,
             modifier = Modifier.align(Alignment.BottomCenter),
@@ -71,10 +76,18 @@ fun BrainUpApp() {
                 onSelect = { navController.navigateToTopLevel(it) },
             )
         }
+        AnimatedVisibility(
+            visible = showIntro,
+            enter = fadeIn(tween(0)),
+            exit = fadeOut(tween(INTRO_FADE_MS)),
+        ) {
+            SplashIntro(onFinished = { showIntro = false })
+        }
     }
 }
 
 private const val TAB_BAR_ANIM_MS = 200
+private const val INTRO_FADE_MS = 300
 
 /** 떠 있는 어두운 탭 바. 선택된 탭은 노란 알약으로 표시한다. */
 @Composable
