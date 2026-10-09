@@ -57,12 +57,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // TODO(출시 전): AdMob 콘솔에서 발급한 실제 앱 ID·광고 단위 ID로 교체
-            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
-            buildConfigField("String", "AD_UNIT_BANNER", "\"ca-app-pub-3940256099942544/9214589741\"")
-            buildConfigField("String", "AD_UNIT_INTERSTITIAL", "\"ca-app-pub-3940256099942544/1033173712\"")
-            buildConfigField("String", "AD_UNIT_REWARDED", "\"ca-app-pub-3940256099942544/5224354917\"")
+            // 실제 AdMob ID. 개발 중에는 debug(테스트 ID)를 쓴다.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-5709349330772121~9722172188"
+            buildConfigField("String", "AD_UNIT_BANNER", "\"ca-app-pub-5709349330772121/6419378113\"")
+            buildConfigField("String", "AD_UNIT_INTERSTITIAL", "\"ca-app-pub-5709349330772121/2926855663\"")
+            buildConfigField("String", "AD_UNIT_REWARDED", "\"ca-app-pub-5709349330772121/9622099835\"")
         }
+    }
+    buildTypes.configureEach {
+        // 실기기에서 릴리스 빌드를 시험할 때 실제 광고 대신 테스트 광고를 받을 기기.
+        // ~/.gradle/gradle.properties에 brainup.adTestDeviceIds=해시1,해시2 형태로 둔다(저장소에 올리지 않음).
+        val testDeviceIds = (project.findProperty("brainup.adTestDeviceIds") as String?).orEmpty()
+        buildConfigField("String", "AD_TEST_DEVICE_IDS", "\"$testDeviceIds\"")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

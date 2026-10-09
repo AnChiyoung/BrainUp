@@ -21,14 +21,26 @@ keyAlias=upload
 keyPassword=비밀번호
 ```
 
-## 2. AdMob 실제 ID로 교체
+## 2. AdMob
 
-1. AdMob 콘솔에서 앱 추가(패키지명 `com.dev.goodluckcy.brainup`, 스토어 등록 후 연결 가능)
-2. 광고 단위 3개 생성: 배너, 전면, 보상형(보상: `continue` 1회)
-3. `app/build.gradle.kts`의 `release` 블록(TODO 표시)에 실제 앱 ID·광고 단위 ID 입력
-   - `debug` 블록은 테스트 ID 그대로 둔다. **개발 중 실제 광고를 클릭하면 계정이 정지될 수 있다.**
-4. AdMob → 개인정보 보호 및 메시지 → GDPR 동의 메시지 생성 및 게시(UMP 동의 양식이 이 설정을 사용한다)
-5. 개발자 웹사이트에 `app-ads.txt` 게시 (AdMob 콘솔에 표시되는 한 줄 그대로)
+- [x] 앱 추가, 광고 단위 3개(배너·전면·보상형) 생성
+- [x] `app/build.gradle.kts`의 `release` 블록에 실제 앱 ID·광고 단위 ID 입력 (2026-10-09)
+  - `debug` 블록은 테스트 ID 그대로 둔다. **개발 중 실제 광고를 보거나 클릭하면 계정이 정지될 수 있다.**
+  - 새 광고 단위는 실제 광고가 나오기까지 수 시간~하루 걸린다(그동안 "No fill", 코드 3).
+- [ ] AdMob → 개인정보 보호 및 메시지 → **GDPR 동의 메시지 생성 및 게시**
+  - 없으면 로그에 `no form(s) configured for the input app ID` 경고가 나온다. 앱은 계속 광고를 요청한다.
+- [ ] 출시 후 Play 스토어와 AdMob 앱 연결
+- [ ] 개발자 웹사이트에 `app-ads.txt` 게시 (AdMob 콘솔에 표시되는 한 줄 그대로)
+
+### 실기기에서 릴리스 빌드를 시험할 때
+
+에뮬레이터는 자동으로 테스트 기기로 처리되지만, 실제 휴대폰은 등록해야 테스트 광고를 받는다.
+
+1. 휴대폰에서 릴리스 빌드를 한 번 실행하고 logcat에서 다음 줄을 찾는다.
+   `Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("해시값"))`
+2. **사용자 홈의** `~/.gradle/gradle.properties`(저장소 아님)에 추가한다.
+   `brainup.adTestDeviceIds=해시값` (여러 대면 쉼표로 구분)
+3. 다시 빌드하면 그 기기에서는 실제 광고 단위로도 테스트 광고만 나온다.
 
 ## 3. 릴리스 빌드
 
@@ -64,7 +76,7 @@ keyPassword=비밀번호
 ## 5. 출시 전 최종 점검
 
 - [ ] `google-services.json`이 빌드 PC의 `app/`에 있는지
-- [ ] release 광고 ID가 실제 ID인지, debug는 테스트 ID인지
+- [x] release 광고 ID가 실제 ID인지, debug는 테스트 ID인지
 - [ ] Firebase Crashlytics 대시보드에 릴리스 빌드 첫 실행이 잡히는지(Crashlytics는 디버그 빌드에서 수집하지 않음)
 - [ ] 실기기에서 세 게임 → 결과 → 기록 → 설정 한 바퀴
 - [ ] 비행기 모드에서 게임 흐름이 막히지 않는지(광고 없이 진행)

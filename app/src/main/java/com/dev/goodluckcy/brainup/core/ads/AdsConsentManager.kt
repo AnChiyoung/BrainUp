@@ -3,8 +3,10 @@ package com.dev.goodluckcy.brainup.core.ads
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.dev.goodluckcy.brainup.BuildConfig
 import com.dev.goodluckcy.brainup.core.common.di.ApplicationScope
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
@@ -75,6 +77,13 @@ class AdsConsentManager @Inject constructor(
 
     private fun initializeMobileAds() {
         if (!mobileAdsInitializing.compareAndSet(false, true)) return
+        // 등록된 시험용 기기에서는 실제 광고 단위로도 테스트 광고만 받는다(에뮬레이터는 자동 적용).
+        val testDeviceIds = BuildConfig.AD_TEST_DEVICE_IDS.split(',').map(String::trim).filter(String::isNotEmpty)
+        if (testDeviceIds.isNotEmpty()) {
+            MobileAds.setRequestConfiguration(
+                RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build(),
+            )
+        }
         applicationScope.launch(Dispatchers.IO) {
             MobileAds.initialize(context) { _isAdsReady.value = true }
         }
