@@ -41,7 +41,7 @@
     <string name="shop_section_tile">패턴 타일 스킨</string>
     <string name="shop_section_theme">지도 테마</string>
     <string name="shop_equipped">장착 중</string>
-    <string name="shop_owned">보유</string>
+    <string name="shop_equip">장착하기</string>
     <string name="shop_not_enough">코인 부족</string>
     <string name="shop_max">가득</string>
     <string name="shop_buy_title">%1$s, 살까요?</string>

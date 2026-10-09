@@ -252,15 +252,26 @@ private fun ItemCard(
 @Composable
 private fun ItemStatus(equipped: Boolean, owned: Boolean, canAfford: Boolean, price: Int) {
     when {
-        equipped -> Text(
-            text = stringResource(R.string.shop_equipped),
+        // 장착 중: 노란 배지 + 체크
+        equipped -> Row(
             modifier = Modifier
                 .background(Sun, RoundedCornerShape(999.dp))
-                .padding(horizontal = 8.dp, vertical = 1.dp),
+                .padding(start = 6.dp, end = 9.dp, top = 2.dp, bottom = 2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+        ) {
+            GameIcon(icon = GameIcons.Check, size = 13.dp, tint = Ink, strokeWidth = 3.4f)
+            Text(stringResource(R.string.shop_equipped), style = MaterialTheme.typography.labelMedium, color = Ink)
+        }
+        // 가졌지만 끼지 않음: 누르면 바로 바뀐다는 걸 알 수 있게 버튼 모양으로
+        owned -> Text(
+            text = stringResource(R.string.shop_equip),
+            modifier = Modifier
+                .border(2.dp, Color.White, RoundedCornerShape(999.dp))
+                .padding(horizontal = 10.dp, vertical = 1.dp),
             style = MaterialTheme.typography.labelMedium,
-            color = Ink,
+            color = Color.White,
         )
-        owned -> Text(stringResource(R.string.shop_owned), style = MaterialTheme.typography.labelMedium, color = Lavender)
         else -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             if (canAfford) {
                 CoinDot(size = 14.dp)
